@@ -1,24 +1,28 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { User } from 'generated/prisma';
-import { CreateUserDto,LoginUserDto } from '../dtoclass'
+import { Users } from 'generated/prisma';
 import * as bcrypt from 'bcrypt';
-//import { LoginUserDto } from '../dtoclass';
 import { JwtService } from '@nestjs/jwt';
+import { CreateUserDto } from 'src/dto/user/create-user.dto';
+import { LoginUserDto } from 'src/dto/user/login-user.dto';
 
 @Injectable()
 export class UserService {
   constructor(
-    private prisma: PrismaService ,
-    private jwtService: JwtService) {}
-  
+    private prisma: PrismaService,
+    private jwtService: JwtService,
+  ) {}
 
-  async findAll(): Promise<User[]> {
-    return this.prisma.user.findMany()
+  async findAll(): Promise<Users[]> {
+    return await this.prisma.users.findMany();
   }
 
-  async findBykey(id: number): Promise<User> {
-    const user = await this.prisma.user.findUnique({
+  async findBykey(id: number): Promise<Users> {
+    const user = await this.prisma.users.findUnique({
       where: { id },
     });
 
@@ -29,19 +33,21 @@ export class UserService {
     return user;
   }
 
-  async create(data: CreateUserDto): Promise<User> {
+  async create(data: CreateUserDto): Promise<Users> {
     const hashedPassword = await bcrypt.hash(data.password, 10);
-    return this.prisma.user.create({ data: {
+    return this.prisma.users.create({
+      data: {
         prenom: data.prenom,
         nom: data.nom,
         email: data.email,
         password: hashedPassword,
         pays: data.pays,
-      }, });
+      },
+    });
   }
 
-  async update(id: number, data: CreateUserDto): Promise<User> {
-    const existing = await this.prisma.user.findUnique({
+  async update(id: number, data: CreateUserDto): Promise<Users> {
+    const existing = await this.prisma.users.findUnique({
       where: { id },
     });
 
@@ -49,14 +55,14 @@ export class UserService {
       throw new NotFoundException(`Utilisateur avec l'id ${id} non trouvé`);
     }
 
-    return this.prisma.user.update({
+    return this.prisma.users.update({
       where: { id },
       data,
     });
   }
 
   async delete(id: number): Promise<any> {
-    const existing = await this.prisma.user.findUnique({
+    const existing = await this.prisma.users.findUnique({
       where: { id },
     });
 
@@ -64,17 +70,15 @@ export class UserService {
       throw new NotFoundException(`Utilisateur avec l'id ${id} non trouvé`);
     }
 
-    await this.prisma.user.delete({
+    await this.prisma.users.delete({
       where: { id },
     });
 
     return { message: 'Utilisateur supprimé avec succès' };
   }
 
-
-
   async login(data: LoginUserDto) {
-    const user = await this.prisma.user.findUnique({
+    const user = await this.prisma.users.findUnique({
       where: { email: data.email },
     });
 
@@ -101,4 +105,3 @@ export class UserService {
     };
   }
 }
-

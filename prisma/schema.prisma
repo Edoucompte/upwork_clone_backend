@@ -14,21 +14,20 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        Int     @id @default(autoincrement())
+model Users {
+  id        Int      @id @default(autoincrement())
   prenom    String
   nom       String
-  email     String  @unique
+  email     String   @unique
   password  String
   pays      String
   compte    Compte[]
-  adresse Adresse?
+  adresse   Adresse?
   createdAt DateTime @default(now())
 }
 
-
 model Compte {
-  id             Int     @id @default(autoincrement())
+  id             Int             @id @default(autoincrement())
   role           String
   titre_compte   String
   taux_horaire   DateTime
@@ -37,79 +36,78 @@ model Compte {
   langues        Langue[]
   portfolios     Portfolio[]
   certifications Certification[]
-  profil_id      Int? @unique
-  profil         Fichier? @relation("CompteProfil", fields: [profil_id], references: [id])
-  user_id        Int     @unique
-  user           User     @relation(fields: [user_id], references: [id])
+  profil_id      Int?            @unique
+  profil         Fichier?        @relation("CompteProfil", fields: [profil_id], references: [id])
+  user_id        Int             @unique
+  user           Users           @relation(fields: [user_id], references: [id])
 }
 
 model Fichier {
-  id                Int             @id @default(autoincrement())
-  libelle           String
-  path              String
-  extension         String
-  poids             String    
-  certification_id  Int
-  certification     Certification   @relation(fields: [certification_id], references: [id])
-  compte            Compte?         @relation("CompteProfil")
+  id               Int           @id @default(autoincrement())
+  libelle          String
+  path             String
+  extension        String
+  poids            String
+  certification_id Int
+  certification    Certification @relation(fields: [certification_id], references: [id])
+  compte           Compte?       @relation("CompteProfil")
 }
 
-model Formation{
-  id             Int     @id @default(autoincrement())
-  ecole  String
-  date_debut DateTime
-  date_fin DateTime
+model Formation {
+  id          Int      @id @default(autoincrement())
+  ecole       String
+  date_debut  DateTime
+  date_fin    DateTime
   nom_diplome String
-  Filiere String
+  Filiere     String
   description String
-  compte_id  Int    
+  compte_id   Int
+  compte      Compte   @relation(fields: [compte_id], references: [id])
+}
+
+model Langue {
+  id        Int    @id @default(autoincrement())
+  nom       String
+  niveau    String
+  compte_id Int    @unique
   compte    Compte @relation(fields: [compte_id], references: [id])
 }
 
-
-model Langue{
-    id             Int     @id @default(autoincrement())
-    nom String
-    niveau String
-    compte_id  Int     @unique
-    compte    Compte @relation(fields: [compte_id], references: [id])
-}
-
-model Certification{
-  id             Int     @id @default(autoincrement())
-  libelle  String
-  fichier Fichier[]
-  type  String
+model Certification {
+  id             Int       @id @default(autoincrement())
+  libelle        String
+  fichier        Fichier[]
+  type           String
   date_obtention DateTime
-  compte_id  Int    
-  compte    Compte @relation(fields: [compte_id], references: [id])
+  compte_id      Int
+  compte         Compte    @relation(fields: [compte_id], references: [id])
 }
 
-model Adresse{
-  id             Int     @id @default(autoincrement())
-  pays String
-  ville  String
-  quartier String
+model Adresse {
+  id          Int    @id @default(autoincrement())
+  pays        String
+  ville       String
+  quartier    String
   code_postal String
-  user_id  Int     @unique
-  user    User @relation(fields: [user_id], references: [id])
-}
-model Portfolio{
-   id             Int     @id @default(autoincrement())
-   titre String
-   role String 
-   description String
-   competences Competence[]
-   compte_id Int
-   compte    Compte @relation(fields: [compte_id], references: [id])
+  user_id     Int    @unique
+  user        Users  @relation(fields: [user_id], references: [id])
 }
 
-model Competence{ 
+model Portfolio {
+  id          Int          @id @default(autoincrement())
+  titre       String
+  role        String
+  description String
+  competences Competence[]
+  compte_id   Int
+  compte      Compte       @relation(fields: [compte_id], references: [id])
+}
 
-  id             Int     @id @default(autoincrement())
-  competence  String
-  compte_id  Int    
-  compte    Compte @relation(fields: [compte_id], references: [id])
-  portfolio_id  Int     
-  portfolio   Portfolio @relation(fields: [portfolio_id], references: [id])
+model Competence {
+  id           Int       @id @default(autoincrement())
+  competence   String
+  compte_id    Int
+  compte       Compte    @relation(fields: [compte_id], references: [id])
+  portfolio_id Int
+  portfolio    Portfolio @relation(fields: [portfolio_id], references: [id])
 }
