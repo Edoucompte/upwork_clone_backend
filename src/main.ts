@@ -18,7 +18,7 @@ async function bootstrap() {
     .setTitle('API Utilisateurs') // Titre de la doc
     .setDescription('API pour gérer les utilisateurs') // Description
     .setVersion('1.0') // Version de l'API
-    .addBearerAuth() // Si tu utilises JWT, tu peux activer ça
+    //.addBearerAuth() // Si tu utilises JWT, tu peux activer ça
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

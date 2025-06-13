@@ -49,7 +49,16 @@ export class UserService {
     });
   }
 
-  async update(id: number, data: CreateUserDto): Promise<Users> {
+  async update(
+    id: number,
+    data: {
+      prenom: string;
+      nom: string;
+      email: string;
+      //password: string; //pas le mot de passe directement
+      pays: string;
+    },
+  ): Promise<Users> {
     const existing = await this.prisma.users.findUnique({
       where: { id },
     });
@@ -57,10 +66,29 @@ export class UserService {
     if (!existing) {
       throw new NotFoundException(`Utilisateur avec l'id ${id} non trouvé`);
     }
+    const { prenom, nom, email, pays } = data;
+
+    // verifiez si parametre non vide et valide
+    const updatedData = {};
+    if (prenom && prenom.length > 2) {
+      updatedData['prenom'] = prenom;
+    }
+
+    if (nom && nom.length > 2) {
+      updatedData['nom'] = nom;
+    }
+
+    if (email && email.length > 6 && email.includes('@')) {
+      updatedData['email'] = email;
+    }
+
+    if (pays && pays.length > 2) {
+      updatedData['pays'] = pays;
+    }
 
     return this.prisma.users.update({
       where: { id },
-      data,
+      data: updatedData,
     });
   }
 
@@ -77,6 +105,6 @@ export class UserService {
       where: { id },
     });
 
-    return { message: 'Utilisateur supprimé avec succès' };
+    return;
   }
 }
