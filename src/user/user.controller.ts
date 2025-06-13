@@ -1,4 +1,4 @@
-import { ApiOperation } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { UserService } from './user.service';
 import {
   Body,
@@ -6,6 +6,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Post,
   Put,
 } from '@nestjs/common';
@@ -13,6 +14,8 @@ import { Users } from 'generated/prisma';
 import { CreateUserDto } from 'src/dto/user/create-user.dto';
 import { ResponseJson } from 'src/dto/response-json';
 
+@ApiTags('Utilisateurs')
+@ApiBearerAuth()
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -41,10 +44,12 @@ export class UserController {
 
   @Get('/:id')
   @ApiOperation({ summary: 'Trouver un utilisateur' })
-  async findBykey(@Param('id') id: string): Promise<ResponseJson> {
+  async findBykey(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<ResponseJson> {
     try {
-      const userId = parseInt(id, 10);
-      const user = await this.userService.findBykey(userId);
+      //const userId = parseInt(id, 10);
+      const user = await this.userService.findBykey(id);
 
       return {
         code: 200,
@@ -97,7 +102,7 @@ export class UserController {
   @Put(':id')
   @ApiOperation({ summary: 'Modifier un utilisateur' })
   async update(
-    @Param('id') id: string,
+    @Param('id', ParseIntPipe) id: number,
 
     @Body()
     data: {
@@ -109,8 +114,7 @@ export class UserController {
     },
   ): Promise<ResponseJson> {
     try {
-      const userId = parseInt(id, 10);
-      const response = await this.userService.update(userId, data);
+      const response = await this.userService.update(id, data);
 
       return {
         code: 200,
@@ -130,10 +134,9 @@ export class UserController {
 
   @Delete(':id')
   @ApiOperation({ summary: 'Supprimer un utilisateur' })
-  async delete(@Param('id') id: string): Promise<any> {
+  async delete(@Param('id', ParseIntPipe) id: number): Promise<any> {
     try {
-      const userId = parseInt(id, 10);
-      const response = await this.userService.delete(userId);
+      const response = await this.userService.delete(id);
 
       return {
         code: 200,

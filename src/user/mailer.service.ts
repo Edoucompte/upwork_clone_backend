@@ -32,11 +32,11 @@ export class MailerService {
 
   async sendResquestedPassword({
     recipient,
-    firstname,
+    prenom,
     token,
   }: {
     recipient: string;
-    firstname: string;
+    prenom: string;
     token: string;
   }) {
     const link = `${process.env.FRONTEND_URL}forget-password?token=${token}`;
@@ -44,7 +44,7 @@ export class MailerService {
       from: 'Acme <onboarding@resend.dev>',
       to: [recipient],
       subject: 'Pour reinitialiser votre mot de password',
-      html: `Bonjour ${firstname}, voici le lien de reinitialisation de votre mot de passe: ${link}`,
+      html: `Bonjour ${prenom}, voici le lien de reinitialisation de votre mot de passe: ${link}`,
     });
 
     if (error) {

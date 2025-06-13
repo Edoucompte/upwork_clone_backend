@@ -15,15 +15,18 @@ datasource db {
 }
 
 model Users {
-  id        Int      @id @default(autoincrement())
-  prenom    String
-  nom       String
-  email     String   @unique
-  password  String
-  pays      String
-  compte    Compte[]
-  adresse   Adresse?
-  createdAt DateTime @default(now())
+  id                  Int      @id @default(autoincrement())
+  prenom              String
+  nom                 String
+  email               String   @unique
+  password            String
+  pays                String
+  isResettingPassword Boolean  @default(false)
+  resetPasswordToken  String?  @unique
+  compte              Compte[]
+  adresse             Adresse?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
 }
 
 model Compte {

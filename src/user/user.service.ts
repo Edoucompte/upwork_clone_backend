@@ -36,6 +36,18 @@ export class UserService {
     return user;
   }
 
+  async findUserByResetToken({ token }: { token: string }) {
+    const user = await this.prisma.users.findUnique({
+      where: { resetPasswordToken: token },
+    });
+
+    if (!user) {
+      throw new NotFoundException(`Utilisateur non trouvé`);
+    }
+
+    return user;
+  }
+
   async create(data: CreateUserDto): Promise<Users> {
     const hashedPassword = await bcrypt.hash(data.password, 10);
     return this.prisma.users.create({

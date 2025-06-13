@@ -5,6 +5,8 @@ import { JwtStrategy } from './jwt.strategy';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { UserService } from 'src/user/user.service';
 import { JwtModule } from '@nestjs/jwt';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { MailerService } from 'src/user/mailer.service';
 
 @Module({
   imports: [
@@ -14,7 +16,14 @@ import { JwtModule } from '@nestjs/jwt';
       signOptions: { expiresIn: '3600s' },
     }),
   ],
-  providers: [AuthService, UserService, JwtStrategy, JwtAuthGuard],
+  providers: [
+    AuthService,
+    UserService,
+    PrismaService,
+    JwtStrategy,
+    JwtAuthGuard,
+    MailerService,
+  ],
   controllers: [AuthController],
 })
 export class AuthModule {}
