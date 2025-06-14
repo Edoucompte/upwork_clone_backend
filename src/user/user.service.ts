@@ -3,7 +3,6 @@ import { PrismaService } from '../prisma/prisma.service';
 import { User } from 'generated/prisma';
 import { CreateUserDto,LoginUserDto } from '../dtoclass'
 import * as bcrypt from 'bcrypt';
-//import { LoginUserDto } from '../dtoclass';
 import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
@@ -13,10 +12,13 @@ export class UserService {
     private jwtService: JwtService) {}
   
 
+//Recuperer tous les utilisateurs
   async findAll(): Promise<User[]> {
     return this.prisma.user.findMany()
   }
 
+
+// Recuperer un utilisateur par son id
   async findBykey(id: number): Promise<User> {
     const user = await this.prisma.user.findUnique({
       where: { id },
@@ -29,6 +31,7 @@ export class UserService {
     return user;
   }
 
+  // Creation d'un utilisateur
   async create(data: CreateUserDto): Promise<User> {
     const hashedPassword = await bcrypt.hash(data.password, 10);
     return this.prisma.user.create({ data: {
@@ -39,6 +42,8 @@ export class UserService {
         pays: data.pays,
       }, });
   }
+
+  // Mise a jour d'un utilisateur
 
   async update(id: number, data: CreateUserDto): Promise<User> {
     const existing = await this.prisma.user.findUnique({
@@ -54,6 +59,8 @@ export class UserService {
       data,
     });
   }
+
+  // Suppression d'un utilisateur
 
   async delete(id: number): Promise<any> {
     const existing = await this.prisma.user.findUnique({
@@ -72,6 +79,7 @@ export class UserService {
   }
 
 
+  // Connexion d'un utilisateur
 
   async login(data: LoginUserDto) {
     const user = await this.prisma.user.findUnique({

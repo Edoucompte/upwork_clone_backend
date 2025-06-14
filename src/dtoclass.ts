@@ -1,5 +1,6 @@
 import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
 
+//classe de validation pour la creation d'un utilisateur et la connexion
 export class CreateUserDto {
   @IsNotEmpty()
   prenom: string;
@@ -18,6 +19,7 @@ export class CreateUserDto {
   pays: string;
 }
 
+//classe de validation pour  la connexion
 export class LoginUserDto {
     @IsEmail()
     email: string;
