@@ -1,56 +1,186 @@
-import { ApiOperation } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { UserService } from './user.service';
-import { Body, Controller, Delete, Get, Param, Post, Put, ValidationPipe } from '@nestjs/common';
-import { User } from 'generated/prisma';
-import { LoginUserDto } from '../dtoclass';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
+  Put,
+  ValidationPipe,
+} from '@nestjs/common';
+import { Users } from 'generated/prisma';
+import { CreateUserDto } from 'src/dto/user/create-user.dto';
+import { ResponseJson } from 'src/dto/response-json';
+import { UpdateUserDto } from 'src/dto/user/update-user.dto';
+import { OutputUser } from 'src/dto/user/output-user.dto';
 
-@Controller('user')
+@ApiTags('Utilisateurs')
+//@ApiBearerAuth()
+@Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
 //controllers liste des utilisateurs
   @Get()
   @ApiOperation({ summary: 'Liste des utilisateurs' })
-  async findAll(): Promise<User[]> {
-    return this.userService.findAll();
+  @ApiResponse({
+    status: 200,
+    description: 'Liste des utilisateurs',
+  })
+  async findAll(): Promise<ResponseJson> {
+    try {
+      const users: OutputUser[] = await this.userService.findAll();
+
+      return {
+        code: 200,
+        error: false,
+        message: 'Liste des utilisateurs',
+        data: users,
+      };
+    } catch (err) {
+      return {
+        code: 400,
+        error: true,
+        message: err.message,
+        data: null,
+      };
+    }
   }
 //controllers recuperer un itulisateur pas son id,
   @Get('/:id')
   @ApiOperation({ summary: 'Trouver un utilisateur' })
-  async findBykey(@Param('id') id: string): Promise<User> {
-    const userId = parseInt(id, 10);
-    return this.userService.findBykey(userId);
+  @ApiResponse({
+    status: 200,
+    description: 'Utilisateur trouve',
+  })
+  async findBykey(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<ResponseJson> {
+    try {
+      //const userId = parseInt(id, 10);
+      const user: OutputUser | null = await this.userService.findBykey(id);
+
+      return {
+        code: 200,
+        error: false,
+        message: 'Utilisateur trouvé',
+        data: user,
+      };
+    } catch (err) {
+      return {
+        code: err.status | 400,
+        error: true,
+        message: err.message,
+        data: null,
+      };
+    }
   }
 //controllers  enregistrement d'un utilisateur
   @Post('create')
   @ApiOperation({ summary: 'Créer un utilisateur' })
-  async create(@Body(new ValidationPipe()) data: { prenom: string; nom: string; email: string; password: string; pays: string }): Promise<User> {
-    return this.userService.create(data);
+  @ApiResponse({
+    status: 200,
+    description: 'Etat de creation Utilisateur ',
+  })
+  async create(
+    /*@Body(new ValidationPipe())
+    data: {
+      prenom: string;
+      nom: string;
+      email: string;
+      password: string;
+      pays: string;
+    },*/
+    @Body() data: CreateUserDto,
+  ): Promise<ResponseJson> {
+    try {
+      const user = await this.userService.create(data);
+
+      return {
+        code: 201,
+        error: false,
+        message: 'Utilisateur créé avec succes',
+        data: user,
+      };
+    } catch (err) {
+      return {
+        code: err.status | 400,
+        error: true,
+        message: err.message,
+        data: null,
+      };
+    }
   }
 //controllers modification d'un utilisateur
   @Put(':id')
   @ApiOperation({ summary: 'Modifier un utilisateur' })
+  @ApiResponse({
+    status: 200,
+    description: "Etat de modification de l'utlisateur",
+  })
   async update(
-    @Param('id') id: string,
-    
-    @Body() data: { prenom: string; nom: string; email: string; password: string; pays: string },
-  ): Promise<User> {
-    const userId = parseInt(id, 10);
-    return this.userService.update(userId, data);
+    @Param('id', ParseIntPipe) id: number,
+
+    @Body(new ValidationPipe())
+    data: UpdateUserDto,
+    /*data: {
+      prenom: string;
+      nom: string;
+      email: string;
+      //password: string; //pas le mot de passe directement
+      pays: string;
+    }*/
+  ): Promise<ResponseJson> {
+    try {
+      const response = await this.userService.update(id, data);
+
+      return {
+        code: 200,
+        error: false,
+        message: 'Utilisateur modifie avec succes',
+        data: response,
+      };
+    } catch (err) {
+      return {
+        code: err.status | 400,
+        error: true,
+        message: err.message,
+        data: null,
+      };
+    }
   }
 //controllers  suppression d'un utilisateur
   @Delete(':id')
   @ApiOperation({ summary: 'Supprimer un utilisateur' })
-  async delete(@Param('id') id: string): Promise<any> {
-    const userId = parseInt(id, 10);
-    return this.userService.delete(userId);
+  @ApiResponse({
+    status: 200,
+    description: "Etat de suppression de l'utlisateur",
+  })
+  async delete(@Param('id', ParseIntPipe) id: number): Promise<ResponseJson> {
+    try {
+      await this.userService.delete(id);
+
+      return {
+        code: 200,
+        error: false,
+        message: 'Utilisateur supprimé avec succès',
+        data: null,
+      };
+    } catch (err) {
+      return {
+        code: err.status | 400,
+        error: true,
+        message: err.message,
+        data: null,
+      };
+    }
   }
-//controllers connexion d'un utilisateur
-  @Post('login')
-@ApiOperation({ summary: 'Connexion utilisateur' })
-async login(@Body(new ValidationPipe()) data: LoginUserDto): Promise<any> {
-  return this.userService.login(data);
-}
-
-
 }
