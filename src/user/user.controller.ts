@@ -1,4 +1,9 @@
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { UserService } from './user.service';
 import {
   Body,
@@ -9,22 +14,29 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  ValidationPipe,
 } from '@nestjs/common';
 import { Users } from 'generated/prisma';
 import { CreateUserDto } from 'src/dto/user/create-user.dto';
 import { ResponseJson } from 'src/dto/response-json';
+import { UpdateUserDto } from 'src/dto/user/update-user.dto';
+import { OutputUser } from 'src/dto/user/output-user.dto';
 
 @ApiTags('Utilisateurs')
-@ApiBearerAuth()
+//@ApiBearerAuth()
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get()
   @ApiOperation({ summary: 'Liste des utilisateurs' })
+  @ApiResponse({
+    status: 200,
+    description: 'Liste des utilisateurs',
+  })
   async findAll(): Promise<ResponseJson> {
     try {
-      const users: Users[] = await this.userService.findAll();
+      const users: OutputUser[] = await this.userService.findAll();
 
       return {
         code: 200,
@@ -44,12 +56,16 @@ export class UserController {
 
   @Get('/:id')
   @ApiOperation({ summary: 'Trouver un utilisateur' })
+  @ApiResponse({
+    status: 200,
+    description: 'Utilisateur trouve',
+  })
   async findBykey(
     @Param('id', ParseIntPipe) id: number,
   ): Promise<ResponseJson> {
     try {
       //const userId = parseInt(id, 10);
-      const user = await this.userService.findBykey(id);
+      const user: OutputUser | null = await this.userService.findBykey(id);
 
       return {
         code: 200,
@@ -69,6 +85,10 @@ export class UserController {
 
   @Post('create')
   @ApiOperation({ summary: 'Créer un utilisateur' })
+  @ApiResponse({
+    status: 200,
+    description: 'Etat de creation Utilisateur ',
+  })
   async create(
     /*@Body(new ValidationPipe())
     data: {
@@ -101,17 +121,22 @@ export class UserController {
 
   @Put(':id')
   @ApiOperation({ summary: 'Modifier un utilisateur' })
+  @ApiResponse({
+    status: 200,
+    description: "Etat de modification de l'utlisateur",
+  })
   async update(
     @Param('id', ParseIntPipe) id: number,
 
-    @Body()
-    data: {
+    @Body(new ValidationPipe())
+    data: UpdateUserDto,
+    /*data: {
       prenom: string;
       nom: string;
       email: string;
       //password: string; //pas le mot de passe directement
       pays: string;
-    },
+    }*/
   ): Promise<ResponseJson> {
     try {
       const response = await this.userService.update(id, data);
@@ -134,9 +159,13 @@ export class UserController {
 
   @Delete(':id')
   @ApiOperation({ summary: 'Supprimer un utilisateur' })
-  async delete(@Param('id', ParseIntPipe) id: number): Promise<any> {
+  @ApiResponse({
+    status: 200,
+    description: "Etat de suppression de l'utlisateur",
+  })
+  async delete(@Param('id', ParseIntPipe) id: number): Promise<ResponseJson> {
     try {
-      const response = await this.userService.delete(id);
+      await this.userService.delete(id);
 
       return {
         code: 200,

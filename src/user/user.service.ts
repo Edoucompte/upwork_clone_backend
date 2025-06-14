@@ -3,23 +3,46 @@ import { PrismaService } from '../prisma/prisma.service';
 import { Users } from 'generated/prisma';
 import * as bcrypt from 'bcrypt';
 import { CreateUserDto } from 'src/dto/user/create-user.dto';
+import { UpdateUserDto } from 'src/dto/user/update-user.dto';
+import { OutputUser } from 'src/dto/user/output-user.dto';
 
 @Injectable()
 export class UserService {
   constructor(private prisma: PrismaService) {}
 
-  async findAll(): Promise<Users[]> {
-    return await this.prisma.users.findMany();
+  async findAll(): Promise<OutputUser[]> {
+    return await this.prisma.users.findMany({
+      select: {
+        id: true,
+        prenom: true,
+        nom: true,
+        email: true,
+        pays: true,
+        createdAt: true,
+        adresse: true,
+        compte: true,
+      },
+    });
   }
 
-  async findBykey(id: number): Promise<Users> {
+  async findBykey(id: number): Promise<OutputUser | null> {
     const user = await this.prisma.users.findUnique({
       where: { id },
+      select: {
+        id: true,
+        prenom: true,
+        nom: true,
+        email: true,
+        pays: true,
+        createdAt: true,
+        adresse: true,
+        compte: true,
+      },
     });
 
-    if (!user) {
+    /*if (!user) {
       throw new NotFoundException(`Utilisateur avec l'id ${id} non trouvé`);
-    }
+    }*/
 
     return user;
   }
@@ -29,9 +52,9 @@ export class UserService {
       where: { email },
     });
 
-    if (!user) {
+    /*if (!user) {
       throw new NotFoundException(`Utilisateur ${email} non trouvé`);
-    }
+    }*/
 
     return user;
   }
@@ -41,36 +64,21 @@ export class UserService {
       where: { resetPasswordToken: token },
     });
 
-    if (!user) {
+    /*if (!user) {
       throw new NotFoundException(`Utilisateur non trouvé`);
-    }
+    }*/
 
     return user;
   }
 
   async create(data: CreateUserDto): Promise<Users> {
-    const hashedPassword = await bcrypt.hash(data.password, 10);
+    //const hashedPassword = await bcrypt.hash(data.password, 10);
     return this.prisma.users.create({
-      data: {
-        prenom: data.prenom,
-        nom: data.nom,
-        email: data.email,
-        password: hashedPassword,
-        pays: data.pays,
-      },
+      data: data,
     });
   }
 
-  async update(
-    id: number,
-    data: {
-      prenom: string;
-      nom: string;
-      email: string;
-      //password: string; //pas le mot de passe directement
-      pays: string;
-    },
-  ): Promise<Users> {
+  async update(id: number, data: UpdateUserDto): Promise<Users> {
     const existing = await this.prisma.users.findUnique({
       where: { id },
     });
@@ -79,6 +87,7 @@ export class UserService {
       throw new NotFoundException(`Utilisateur avec l'id ${id} non trouvé`);
     }
     const { prenom, nom, email, pays } = data;
+    console.log(data);
 
     // verifiez si parametre non vide et valide
     const updatedData = {};

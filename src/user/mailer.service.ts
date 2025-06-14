@@ -9,17 +9,17 @@ export class MailerService {
 
   async createAccountEmail({
     recipient,
-    firstname,
+    prenom,
   }: {
     recipient: string;
-    firstname: string;
+    prenom: string;
   }) {
     const { data, error } = await this.mailer.emails.send({
       from: 'Acme <onboarding@resend.dev>',
       to: [recipient],
       subject: 'Bienvenu sur la plateforme',
       html:
-        `Bonjour ${firstname}, et Bienvenu chez nous ! Nous sommes ` +
+        `Bonjour ${prenom}, et Bienvenu chez nous ! Nous sommes ` +
         '<strong>heureux</strong> de vous avoir parmi nous.',
     });
 
