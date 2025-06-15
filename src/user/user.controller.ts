@@ -28,6 +28,7 @@ import { OutputUser } from 'src/dto/user/output-user.dto';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+//controllers liste des utilisateurs
   @Get()
   @ApiOperation({ summary: 'Liste des utilisateurs' })
   @ApiResponse({
@@ -53,7 +54,7 @@ export class UserController {
       };
     }
   }
-
+//controllers recuperer un itulisateur pas son id,
   @Get('/:id')
   @ApiOperation({ summary: 'Trouver un utilisateur' })
   @ApiResponse({
@@ -82,7 +83,7 @@ export class UserController {
       };
     }
   }
-
+//controllers  enregistrement d'un utilisateur
   @Post('create')
   @ApiOperation({ summary: 'Créer un utilisateur' })
   @ApiResponse({
@@ -118,7 +119,7 @@ export class UserController {
       };
     }
   }
-
+//controllers modification d'un utilisateur
   @Put(':id')
   @ApiOperation({ summary: 'Modifier un utilisateur' })
   @ApiResponse({
@@ -156,7 +157,7 @@ export class UserController {
       };
     }
   }
-
+//controllers  suppression d'un utilisateur
   @Delete(':id')
   @ApiOperation({ summary: 'Supprimer un utilisateur' })
   @ApiResponse({
