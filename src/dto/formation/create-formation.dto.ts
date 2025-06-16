@@ -1,8 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
   IsDateString,
+  IsInt,
   IsNotEmpty,
-  IsNumber,
   IsString,
   MinLength,
 } from 'class-validator';
@@ -16,15 +16,18 @@ export class CreateFormationDto {
   @ApiProperty()
   ecole: string;
 
+  @ApiProperty()
   @IsNotEmpty({
     message: 'La date de debut est recquise',
   })
   @IsDateString({}, { message: 'Foramt de date de debut incorrecte' })
   date_debut: Date;
 
+  @ApiProperty()
   @IsDateString({}, { message: 'Foramt de date de fin incorrecte' })
   date_fin: Date;
 
+  @ApiProperty()
   @IsNotEmpty({
     message: 'Un nom de diplome est recquis',
   })
@@ -32,6 +35,7 @@ export class CreateFormationDto {
   @IsString({ message: 'Nom de diplôme en lettres' })
   nom_diplome: string;
 
+  @ApiProperty()
   @IsNotEmpty({
     message: 'Une filière est recquise',
   })
@@ -39,43 +43,14 @@ export class CreateFormationDto {
   @IsString({ message: 'Nom de filière en lettres' })
   filiere: string;
 
+  @ApiProperty()
   @IsNotEmpty({ message: 'Un nom de diplome est recquis' })
   @MinLength(2, { message: 'Entrez au moins 2 caracteres pour le diplôme' })
   @IsString({ message: 'Nom de diplôme en lettres' })
   description: string;
 
-  @IsNumber()
-  @IsNotEmpty({ message: 'compte associe non fourni' })
-  compte_id: number;
-}
-import { IsNotEmpty, IsString, IsDateString, IsInt } from 'class-validator';
-
-export class CreateFormationDto {
-  @IsNotEmpty()
-  @IsString()
-  ecole: string;
-
-  @IsNotEmpty()
-  @IsDateString()
-  date_debut: string;
-
-  @IsNotEmpty()
-  @IsDateString()
-  date_fin: string;
-
-  @IsNotEmpty()
-  @IsString()
-  nom_diplome: string;
-
-  @IsNotEmpty()
-  @IsString()
-  filiere: string;
-
-  @IsNotEmpty()
-  @IsString()
-  description: string;
-
-  @IsNotEmpty()
+  @ApiProperty()
   @IsInt()
+  @IsNotEmpty({ message: 'compte associe non fourni' })
   compte_id: number;
 }

@@ -1,12 +1,8 @@
-import {
-  IsInt,
-  IsNotEmpty,
-  IsNumber,
-  IsString,
-  MinLength,
-} from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsInt, IsNotEmpty, IsString, MinLength } from 'class-validator';
 
 export class CreateLangueDto {
+  @ApiProperty()
   @IsNotEmpty({
     message: 'Un nom de langue est recquis',
   })
@@ -14,6 +10,7 @@ export class CreateLangueDto {
   @IsString({ message: 'Nom de langue en lettres' })
   nom: string;
 
+  @ApiProperty()
   @IsNotEmpty({
     message: 'Un niveau de langue est recquis',
   })
@@ -21,6 +18,7 @@ export class CreateLangueDto {
   @IsString({ message: 'Niveau de langue en lettres' })
   niveau: string;
 
+  @ApiProperty()
   @IsInt()
   @IsNotEmpty({ message: 'compte associe non fourni' })
   compte_id: number;

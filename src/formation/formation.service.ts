@@ -1,12 +1,16 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Formation } from 'generated/prisma';
+import { CompteService } from 'src/compte/compte.service';
 import { CreateFormationDto } from 'src/dto/formation/create-formation.dto';
 import { UpdateFormationDto } from 'src/dto/formation/update-formation.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class FormationService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private readonly compteService: CompteService,
+  ) {}
 
   // Recherche de tous les formation
   async findAll(): Promise<Formation[]> {
@@ -55,13 +59,22 @@ export class FormationService {
     // verifiez si parametre non vide et valide
 
     const updatedData = {};
+
+    if (compte_id && compte_id > 0) {
+      // verifier si compte existe
+      const compteTrouve = await this.compteService.findBykey(compte_id);
+      if (!compteTrouve) {
+        throw new NotFoundException('Compte fourni inexistant');
+      }
+      updatedData['compte_id'] = compte_id;
+    }
     if (ecole && ecole.length > 2) {
       updatedData['ecole'] = ecole;
     }
-    if (date_debut && date_debut.length > 2) {
+    if (date_debut && Date.now() - date_debut.getTime() > 0) {
       updatedData['date_debut'] = date_debut;
     }
-    if (date_fin && date_fin.length > 2) {
+    if (date_fin && Date.now() - date_fin.getTime() > 2) {
       updatedData['date_fin'] = date_fin;
     }
     if (nom_diplome && nom_diplome.length > 2) {
@@ -72,9 +85,6 @@ export class FormationService {
     }
     if (description && description.length > 2) {
       updatedData['description'] = description;
-    }
-    if (compte_id && compte_id > 0) {
-      updatedData['compte_id'] = compte_id;
     }
 
     return this.prisma.formation.update({

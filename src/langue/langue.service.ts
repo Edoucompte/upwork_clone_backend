@@ -1,12 +1,16 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Langue } from 'generated/prisma';
+import { CompteService } from 'src/compte/compte.service';
 import { CreateLangueDto } from 'src/dto/langue/create-langue.dto';
 import { UpdateLangueDto } from 'src/dto/langue/update-langue.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class LangueService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private readonly compteService: CompteService,
+  ) {}
 
   // Recherche de tous les Langues
   async findAll(): Promise<Langue[]> {
@@ -54,6 +58,11 @@ export class LangueService {
       updatedData['niveau'] = niveau;
     }
     if (compte_id && compte_id > 0) {
+      // verifier si compte existe
+      const compteTrouve = await this.compteService.findBykey(compte_id);
+      if (!compteTrouve) {
+        throw new NotFoundException('Compte fourni inexistant');
+      }
       updatedData['compte_id'] = compte_id;
     }
 

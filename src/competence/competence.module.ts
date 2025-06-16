@@ -4,6 +4,6 @@ import { CompetenceService } from './competence.service';
 
 @Module({
   controllers: [CompetenceController],
-  providers: [CompetenceService]
+  providers: [CompetenceService],
 })
 export class CompetenceModule {}
