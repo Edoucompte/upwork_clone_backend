@@ -62,7 +62,7 @@ model Formation {
   date_debut  DateTime
   date_fin    DateTime
   nom_diplome String
-  Filiere     String
+  filiere     String
   description String
   compte_id   Int
   compte      Compte   @relation(fields: [compte_id], references: [id])
