@@ -12,7 +12,18 @@ export class CompteService {
     
         // Recherche de tous les comptes
       async findAll(): Promise<Compte[]> {
-         const allcomptes = await this.prisma.compte.findMany();
+         const allcomptes = await this.prisma.compte.findMany(
+        {
+         include: {
+            langues: true, // récupère toutes les langues associées
+            formations: true, // récupère toutes les formations associées
+            competences: true, // récupère toutes les compétences associées
+            portfolios: true, // récupère tous les portfolios associés
+            
+          }, 
+        }
+          
+         );
         return allcomptes;
       }
         // Recherche d'un compte par son ID
@@ -20,6 +31,13 @@ export class CompteService {
       async findBykey(id: number): Promise<Compte | null> {
         const compte = await this.prisma.compte.findUnique({
           where: { id }
+          ,
+          include: {
+            langues: true, // récupère toutes les langues associées
+            formations: true, // récupère toutes les formations associées
+            competences: true, // récupère toutes les compétences associées
+            portfolios: true, // récupère tous les portfolios associés
+          },
         });
 
         return compte;
