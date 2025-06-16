@@ -7,29 +7,28 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  ValidationPipe,
 } from '@nestjs/common';
+import { LangueService } from './langue.service';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ResponseJson } from 'src/dto/response-json';
-import { Formation, Langue } from 'generated/prisma';
-import { LangueService } from './langue.service';
 import { CreateLangueDto } from 'src/dto/langue/create-langue.dto';
 import { UpdateLangueDto } from 'src/dto/langue/update-langue.dto';
-
 @ApiTags('Langues')
-//@ApiBearerAuth()
 @Controller('langue')
 export class LangueController {
   constructor(private readonly langueService: LangueService) {}
 
+  //controllers liste des  langues
   @Get()
-  @ApiOperation({ summary: 'Liste des Langues' })
+  @ApiOperation({ summary: 'Liste des langues' })
   @ApiResponse({
     status: 200,
-    description: 'Liste des Langues',
+    description: 'Liste des  langues',
   })
   async findAll(): Promise<ResponseJson> {
     try {
-      const langues: Langue[] = await this.langueService.findAll();
+      const langues = await this.langueService.findAll();
 
       return {
         code: 200,
@@ -39,7 +38,7 @@ export class LangueController {
       };
     } catch (err) {
       return {
-        code: err.status,
+        code: 400,
         error: true,
         message: err.message,
         data: null,
@@ -47,6 +46,7 @@ export class LangueController {
     }
   }
 
+  //controllers recuperer une langue par son id,
   @Get('/:id')
   @ApiOperation({ summary: 'Trouver une langue' })
   @ApiResponse({
@@ -58,13 +58,13 @@ export class LangueController {
   ): Promise<ResponseJson> {
     try {
       //const userId = parseInt(id, 10);
-      const langue: Formation | null = await this.langueService.findByKey(id);
+      const compte = await this.langueService.findBykey(id);
 
       return {
         code: 200,
         error: false,
-        message: 'langue trouvée',
-        data: langue,
+        message: 'Langue trouvé',
+        data: compte,
       };
     } catch (err) {
       return {
@@ -75,22 +75,22 @@ export class LangueController {
       };
     }
   }
-
+  //controllers  creation d'une langue
   @Post('create')
   @ApiOperation({ summary: 'Créer une langue' })
   @ApiResponse({
     status: 200,
-    description: 'Etat de creation langue ',
+    description: 'Etat de creation  langue ',
   })
   async create(@Body() data: CreateLangueDto): Promise<ResponseJson> {
     try {
-      const langue = await this.langueService.create(data);
+      const compte = await this.langueService.create(data);
 
       return {
         code: 201,
         error: false,
-        message: 'Langue créée avec succes',
-        data: langue,
+        message: 'Langue créé avec succes',
+        data: compte,
       };
     } catch (err) {
       return {
@@ -101,17 +101,17 @@ export class LangueController {
       };
     }
   }
-
+  //controllers modification d'une langue
   @Put(':id')
   @ApiOperation({ summary: 'Modifier une langue' })
   @ApiResponse({
     status: 200,
-    description: 'Etat de modification de la langue',
+    description: "Etat de modification d'une langue",
   })
   async update(
     @Param('id', ParseIntPipe) id: number,
 
-    @Body()
+    @Body(new ValidationPipe())
     data: UpdateLangueDto,
   ): Promise<ResponseJson> {
     try {
@@ -120,7 +120,7 @@ export class LangueController {
       return {
         code: 200,
         error: false,
-        message: 'Langue modifiee avec succes',
+        message: 'Langue modifie avec succes',
         data: response,
       };
     } catch (err) {
@@ -132,7 +132,7 @@ export class LangueController {
       };
     }
   }
-
+  //controllers  suppression d'un utilisateur
   @Delete(':id')
   @ApiOperation({ summary: 'Supprimer une langue' })
   @ApiResponse({
@@ -146,7 +146,7 @@ export class LangueController {
       return {
         code: 200,
         error: false,
-        message: 'Langue supprimée avec succès',
+        message: 'langue supprimé avec succès',
         data: null,
       };
     } catch (err) {

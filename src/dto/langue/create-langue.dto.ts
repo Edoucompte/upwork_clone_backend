@@ -1,4 +1,10 @@
-import { IsNotEmpty, IsNumber, IsString, MinLength } from 'class-validator';
+import {
+  IsInt,
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+  MinLength,
+} from 'class-validator';
 
 export class CreateLangueDto {
   @IsNotEmpty({
@@ -15,7 +21,7 @@ export class CreateLangueDto {
   @IsString({ message: 'Niveau de langue en lettres' })
   niveau: string;
 
-  @IsNumber()
+  @IsInt()
   @IsNotEmpty({ message: 'compte associe non fourni' })
   compte_id: number;
 }

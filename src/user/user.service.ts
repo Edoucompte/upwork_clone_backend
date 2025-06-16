@@ -1,10 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Users } from 'generated/prisma';
-import * as bcrypt from 'bcrypt';
+import { OutputUser } from 'src/dto/user/output-user.dto';
 import { CreateUserDto } from 'src/dto/user/create-user.dto';
 import { UpdateUserDto } from 'src/dto/user/update-user.dto';
-import { OutputUser } from 'src/dto/user/output-user.dto';
 
 @Injectable()
 export class UserService {
@@ -112,6 +111,8 @@ export class UserService {
       data: updatedData,
     });
   }
+
+  // Suppression d'un utilisateur
 
   async delete(id: number): Promise<any> {
     const existing = await this.prisma.users.findUnique({

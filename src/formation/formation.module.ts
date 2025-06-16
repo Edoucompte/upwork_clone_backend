@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
-import { FormationService } from './formation.service';
 import { FormationController } from './formation.controller';
+import { FormationService } from './formation.service';
 
 @Module({
-  providers: [FormationService],
   controllers: [FormationController],
+  providers: [FormationService],
 })
 export class FormationModule {}

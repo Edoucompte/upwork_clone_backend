@@ -6,74 +6,74 @@ import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class FormationService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) {}
 
+  // Recherche de tous les formation
   async findAll(): Promise<Formation[]> {
-    return await this.prisma.formation.findMany();
+    const allformations = await this.prisma.formation.findMany();
+    return allformations;
+  }
+  // Recherche d'un formation par son ID
+
+  async findBykey(id: number): Promise<Formation | null> {
+    const formation = await this.prisma.formation.findUnique({
+      where: { id },
+    });
+
+    return formation;
   }
 
-  async findByKey(id: number): Promise<Formation | null> {
-    return await this.prisma.formation.findUnique({
-      where: {
-        id,
-      },
-    });
-  }
+  // Création de formation
 
   async create(data: CreateFormationDto): Promise<Formation> {
-    //const hashedPassword = await bcrypt.hash(data.password, 10);
+    // Vérification si la formation existe déjà
+
     return this.prisma.formation.create({
       data: data,
     });
   }
 
   async update(id: number, data: UpdateFormationDto): Promise<Formation> {
-    const existing = await this.prisma.users.findUnique({
+    const existing = await this.prisma.formation.findUnique({
       where: { id },
     });
-
+    // Vérification si la formation existe
     if (!existing) {
-      throw new NotFoundException(`Formation avec l'id ${id} non trouvé`);
+      throw new NotFoundException(`formation avec l'id ${id} non trouvé`);
     }
+
     const {
       ecole,
-      nom_diplome,
       date_debut,
       date_fin,
+      nom_diplome,
       filiere,
       description,
       compte_id,
     } = data;
 
     // verifiez si parametre non vide et valide
+
     const updatedData = {};
     if (ecole && ecole.length > 2) {
       updatedData['ecole'] = ecole;
     }
-
+    if (date_debut && date_debut.length > 2) {
+      updatedData['date_debut'] = date_debut;
+    }
+    if (date_fin && date_fin.length > 2) {
+      updatedData['date_fin'] = date_fin;
+    }
     if (nom_diplome && nom_diplome.length > 2) {
       updatedData['nom_diplome'] = nom_diplome;
     }
-
-    if (date_debut && Date.now() - date_debut.getTime() > 0) {
-      updatedData['date_debut'] = date_debut;
-    }
-
-    if (date_fin && Date.now() - date_fin.getTime() > 0) {
-      updatedData['date_fin'] = date_fin;
-    }
-
     if (filiere && filiere.length > 2) {
       updatedData['filiere'] = filiere;
     }
-
     if (description && description.length > 2) {
       updatedData['description'] = description;
     }
-
-    // chercher le compte ici pour verifier
-    //const compte = await
-    if (compte_id && true) {
+    if (compte_id && compte_id > 0) {
       updatedData['compte_id'] = compte_id;
     }
 
@@ -83,13 +83,15 @@ export class FormationService {
     });
   }
 
+  // Suppression d'une formation
+
   async delete(id: number): Promise<any> {
     const existing = await this.prisma.formation.findUnique({
       where: { id },
     });
 
     if (!existing) {
-      throw new NotFoundException(`Formation avec l'id ${id} non trouvée`);
+      throw new NotFoundException(`formation avec l'id ${id} non trouvé`);
     }
 
     await this.prisma.formation.delete({

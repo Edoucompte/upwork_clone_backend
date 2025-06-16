@@ -6,22 +6,28 @@ import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class LangueService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) {}
 
+  // Recherche de tous les Langues
   async findAll(): Promise<Langue[]> {
-    return await this.prisma.langue.findMany();
+    const allLangue = await this.prisma.langue.findMany();
+    return allLangue;
+  }
+  // Recherche d'un Langues par son ID
+
+  async findBykey(id: number): Promise<Langue | null> {
+    const langue = await this.prisma.langue.findUnique({
+      where: { id },
+    });
+
+    return langue;
   }
 
-  async findByKey(id: number): Promise<Langue | null> {
-    return await this.prisma.langue.findUnique({
-      where: {
-        id,
-      },
-    });
-  }
+  // Création de langue
 
   async create(data: CreateLangueDto): Promise<Langue> {
-    //const hashedPassword = await bcrypt.hash(data.password, 10);
+    // Vérification si la langue existe déjà
+
     return this.prisma.langue.create({
       data: data,
     });
@@ -31,25 +37,23 @@ export class LangueService {
     const existing = await this.prisma.langue.findUnique({
       where: { id },
     });
-
+    // Vérification si la langue existe
     if (!existing) {
-      throw new NotFoundException(`Langue avec l'id ${id} non trouvée`);
+      throw new NotFoundException(`langue avec l'id ${id} non trouvé`);
     }
+
     const { nom, niveau, compte_id } = data;
 
     // verifiez si parametre non vide et valide
+
     const updatedData = {};
     if (nom && nom.length > 2) {
       updatedData['nom'] = nom;
     }
-
     if (niveau && niveau.length > 2) {
       updatedData['niveau'] = niveau;
     }
-
-    // chercher le compte ici pour verifier
-    //const compte = await
-    if (compte_id && true) {
+    if (compte_id && compte_id > 0) {
       updatedData['compte_id'] = compte_id;
     }
 
@@ -59,13 +63,15 @@ export class LangueService {
     });
   }
 
+  // Suppression d'une langue
+
   async delete(id: number): Promise<any> {
     const existing = await this.prisma.langue.findUnique({
       where: { id },
     });
 
     if (!existing) {
-      throw new NotFoundException(`Langue avec l'id ${id} non trouvée`);
+      throw new NotFoundException(`Langue avec l'id ${id} non trouvé`);
     }
 
     await this.prisma.langue.delete({

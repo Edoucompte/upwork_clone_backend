@@ -72,7 +72,7 @@ model Langue {
   id        Int    @id @default(autoincrement())
   nom       String
   niveau    String
-  compte_id Int    @unique
+  compte_id Int   
   compte    Compte @relation(fields: [compte_id], references: [id])
 }
 
@@ -109,8 +109,8 @@ model Portfolio {
 model Competence {
   id           Int       @id @default(autoincrement())
   competence   String
-  compte_id    Int
-  compte       Compte    @relation(fields: [compte_id], references: [id])
-  portfolio_id Int
-  portfolio    Portfolio @relation(fields: [portfolio_id], references: [id])
+  compte_id    Int?
+  compte       Compte?    @relation(fields: [compte_id], references: [id])
+  portfolio_id Int?
+  portfolio    Portfolio? @relation(fields: [portfolio_id], references: [id])
 }
