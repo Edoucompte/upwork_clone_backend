@@ -9,33 +9,36 @@ import {
   Put,
   ValidationPipe,
 } from '@nestjs/common';
-import { FormationService } from './formation.service';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { ResponseJson } from 'src/dto/response-json';
 import { CreateFormationDto } from 'src/dto/formation/create-formation.dto';
 import { UpdateFormationDto } from 'src/dto/formation/update-formation.dto';
 import { ApiTags } from '@nestjs/swagger';
-@ApiTags('Formations')
-@Controller('formation')
-export class FormationController {
-  constructor(private readonly formationService: FormationService) {}
+import { FichierService } from './fichier.service';
+import { CreateFichierDto } from 'src/dto/fichier/create-fichier.dto';
+import { UpdateFichierDto } from 'src/dto/fichier/update-fichier.dto';
 
-  //controllers liste des  formation
+@ApiTags('Fichiers')
+@Controller('fichier')
+export class FichierController {
+  constructor(private readonly fichierService: FichierService) {}
+
+  //controllers liste des fichiers
   @Get()
-  @ApiOperation({ summary: 'Liste des Formations' })
+  @ApiOperation({ summary: 'Liste des Fichiers' })
   @ApiResponse({
     status: 200,
-    description: 'Liste des  formations',
+    description: 'Liste des fichiers',
   })
   async findAll(): Promise<ResponseJson> {
     try {
-      const formations = await this.formationService.findAll();
+      const fichiers = await this.fichierService.findAll();
 
       return {
         code: 200,
         error: false,
-        message: 'Liste des formations',
-        data: formations,
+        message: 'Liste des fichiers',
+        data: fichiers,
       };
     } catch (err) {
       return {
@@ -47,25 +50,24 @@ export class FormationController {
     }
   }
 
-  //controllers recuperer une formation par son id,
+  //controllers recuperer un fichier par son id,
   @Get('/:id')
-  @ApiOperation({ summary: 'Trouver une formation' })
+  @ApiOperation({ summary: 'Trouver un fichier' })
   @ApiResponse({
     status: 200,
-    description: 'formation trouve',
+    description: 'fichier trouve',
   })
   async findBykey(
     @Param('id', ParseIntPipe) id: number,
   ): Promise<ResponseJson> {
     try {
-      //const userId = parseInt(id, 10);
-      const formation = await this.formationService.findBykey(id);
+      const fichier = await this.fichierService.findBykey(id);
 
       return {
         code: 200,
         error: false,
         message: 'formation trouvé',
-        data: formation,
+        data: fichier,
       };
     } catch (err) {
       return {
@@ -76,21 +78,21 @@ export class FormationController {
       };
     }
   }
-  //controllers  creation d'une formation
+  //controllers  creation d'un fichier
   @Post('create')
-  @ApiOperation({ summary: 'Créer une formation' })
+  @ApiOperation({ summary: 'Créer un fichier' })
   @ApiResponse({
     status: 200,
-    description: 'Etat de creation  formation ',
+    description: 'Etat de creation fichier',
   })
-  async create(@Body() data: CreateFormationDto): Promise<ResponseJson> {
+  async create(@Body() data: CreateFichierDto): Promise<ResponseJson> {
     try {
-      const formation = await this.formationService.create(data);
+      const formation = await this.fichierService.create(data);
 
       return {
         code: 201,
         error: false,
-        message: 'Formation créée avec succes',
+        message: 'fichier créé avec succes',
         data: formation,
       };
     } catch (err) {
@@ -102,26 +104,26 @@ export class FormationController {
       };
     }
   }
-  //controllers modification d'une formation
+  //controllers modification d'un fichier
   @Put(':id')
-  @ApiOperation({ summary: 'Modifier une formation' })
+  @ApiOperation({ summary: 'Modifier un fichier' })
   @ApiResponse({
     status: 200,
-    description: "Etat de modification d'une formation",
+    description: "Etat de modification d'un fichier",
   })
   async update(
     @Param('id', ParseIntPipe) id: number,
 
     @Body(new ValidationPipe())
-    data: UpdateFormationDto,
+    data: UpdateFichierDto,
   ): Promise<ResponseJson> {
     try {
-      const response = await this.formationService.update(id, data);
+      const response = await this.fichierService.update(id, data);
 
       return {
         code: 200,
         error: false,
-        message: 'formation modifie avec succes',
+        message: 'fichier modifie avec succes',
         data: response,
       };
     } catch (err) {
@@ -133,21 +135,21 @@ export class FormationController {
       };
     }
   }
-  //controllers  suppression d'une formation
+  //controllers  suppression d'un fichier
   @Delete(':id')
-  @ApiOperation({ summary: 'Supprimer une formation' })
+  @ApiOperation({ summary: 'Supprimer un fichiers' })
   @ApiResponse({
     status: 200,
-    description: 'Etat de suppression de la formation',
+    description: 'Etat de suppression du fichier',
   })
   async delete(@Param('id', ParseIntPipe) id: number): Promise<ResponseJson> {
     try {
-      await this.formationService.delete(id);
+      await this.fichierService.delete(id);
 
       return {
         code: 200,
         error: false,
-        message: 'formation supprimé avec succès',
+        message: 'fichier supprimé avec succès',
         data: null,
       };
     } catch (err) {

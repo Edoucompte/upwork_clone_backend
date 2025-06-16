@@ -20,11 +20,11 @@ export class CreateFormationDto {
   @IsNotEmpty({
     message: 'La date de debut est recquise',
   })
-  @IsDateString({}, { message: 'Foramt de date de debut incorrecte' })
+  @IsDateString({}, { message: 'Format de date de debut incorrecte' })
   date_debut: Date;
 
   @ApiProperty()
-  @IsDateString({}, { message: 'Foramt de date de fin incorrecte' })
+  @IsDateString({}, { message: 'Format de date de fin incorrecte' })
   date_fin: Date;
 
   @ApiProperty()

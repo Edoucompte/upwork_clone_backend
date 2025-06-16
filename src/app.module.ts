@@ -7,6 +7,8 @@ import { AuthModule } from './auth/auth.module';
 import { CompteModule } from './compte/compte.module';
 import { AdresseModule } from './adresse/adresse.module';
 import { LangueModule } from './langue/langue.module';
+import { CertificationModule } from './certification/certification.module';
+import { FichierModule } from './fichier/fichier.module';
 import { FormationModule } from './formation/formation.module';
 import { CompetenceModule } from './competence/competence.module';
 import { FormationModule } from './formation/formation.module';
@@ -24,6 +26,8 @@ import { LangueModule } from './langue/langue.module';
     CompetenceModule,
     FormationModule,
     LangueModule,
+    FichierModule,
+    CertificationModule,
   ],
   controllers: [AppController],
   providers: [AppService],

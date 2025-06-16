@@ -32,6 +32,12 @@ export class FormationService {
   async create(data: CreateFormationDto): Promise<Formation> {
     // Vérification si la formation existe déjà
 
+    // verifier si le compte associe existe
+    const compteTrouve = await this.compteService.findBykey(data.compte_id);
+    if (!compteTrouve) {
+      throw new NotFoundException('Compte fourni inexistant');
+    }
+
     return this.prisma.formation.create({
       data: data,
     });

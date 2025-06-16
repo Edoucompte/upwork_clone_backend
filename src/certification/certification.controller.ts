@@ -9,33 +9,32 @@ import {
   Put,
   ValidationPipe,
 } from '@nestjs/common';
-import { FormationService } from './formation.service';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { ResponseJson } from 'src/dto/response-json';
-import { CreateFormationDto } from 'src/dto/formation/create-formation.dto';
-import { UpdateFormationDto } from 'src/dto/formation/update-formation.dto';
-import { ApiTags } from '@nestjs/swagger';
-@ApiTags('Formations')
-@Controller('formation')
-export class FormationController {
-  constructor(private readonly formationService: FormationService) {}
+import { CertificationService } from './certification.service';
+import { CreateCertificationDto } from 'src/dto/certification/create-certification.dto';
+import { UpdateCertificationDto } from 'src/dto/certification/update-certification.dto';
 
-  //controllers liste des  formation
+@Controller('certification')
+export class CertificationController {
+  constructor(private readonly certificationService: CertificationService) {}
+
+  //controllers liste des certifications
   @Get()
-  @ApiOperation({ summary: 'Liste des Formations' })
+  @ApiOperation({ summary: 'Liste des certifications' })
   @ApiResponse({
     status: 200,
-    description: 'Liste des  formations',
+    description: 'Liste des certifications',
   })
   async findAll(): Promise<ResponseJson> {
     try {
-      const formations = await this.formationService.findAll();
+      const certifications = await this.certificationService.findAll();
 
       return {
         code: 200,
         error: false,
-        message: 'Liste des formations',
-        data: formations,
+        message: 'Liste des certifications',
+        data: certifications,
       };
     } catch (err) {
       return {
@@ -47,25 +46,25 @@ export class FormationController {
     }
   }
 
-  //controllers recuperer une formation par son id,
+  //controllers recuperer une certification par son id,
   @Get('/:id')
-  @ApiOperation({ summary: 'Trouver une formation' })
+  @ApiOperation({ summary: 'Trouver une certification' })
   @ApiResponse({
     status: 200,
-    description: 'formation trouve',
+    description: 'certification trouve',
   })
   async findBykey(
     @Param('id', ParseIntPipe) id: number,
   ): Promise<ResponseJson> {
     try {
       //const userId = parseInt(id, 10);
-      const formation = await this.formationService.findBykey(id);
+      const certification = await this.certificationService.findBykey(id);
 
       return {
         code: 200,
         error: false,
-        message: 'formation trouvé',
-        data: formation,
+        message: 'certification trouvé',
+        data: certification,
       };
     } catch (err) {
       return {
@@ -76,22 +75,22 @@ export class FormationController {
       };
     }
   }
-  //controllers  creation d'une formation
+  //controllers  creation d'une certification
   @Post('create')
-  @ApiOperation({ summary: 'Créer une formation' })
+  @ApiOperation({ summary: 'Créer une certification' })
   @ApiResponse({
     status: 200,
-    description: 'Etat de creation  formation ',
+    description: 'Etat de creation certification ',
   })
-  async create(@Body() data: CreateFormationDto): Promise<ResponseJson> {
+  async create(@Body() data: CreateCertificationDto): Promise<ResponseJson> {
     try {
-      const formation = await this.formationService.create(data);
+      const certification = await this.certificationService.create(data);
 
       return {
         code: 201,
         error: false,
-        message: 'Formation créée avec succes',
-        data: formation,
+        message: 'Certification créé avec succes',
+        data: certification,
       };
     } catch (err) {
       return {
@@ -102,26 +101,26 @@ export class FormationController {
       };
     }
   }
-  //controllers modification d'une formation
+  //controllers modification d'une certifications
   @Put(':id')
-  @ApiOperation({ summary: 'Modifier une formation' })
+  @ApiOperation({ summary: 'Modifier une certification' })
   @ApiResponse({
     status: 200,
-    description: "Etat de modification d'une formation",
+    description: "Etat de modification d'une certification",
   })
   async update(
     @Param('id', ParseIntPipe) id: number,
 
     @Body(new ValidationPipe())
-    data: UpdateFormationDto,
+    data: UpdateCertificationDto,
   ): Promise<ResponseJson> {
     try {
-      const response = await this.formationService.update(id, data);
+      const response = await this.certificationService.update(id, data);
 
       return {
         code: 200,
         error: false,
-        message: 'formation modifie avec succes',
+        message: 'certification modifie avec succes',
         data: response,
       };
     } catch (err) {
@@ -133,21 +132,21 @@ export class FormationController {
       };
     }
   }
-  //controllers  suppression d'une formation
+  //controllers  suppression d'une certification
   @Delete(':id')
-  @ApiOperation({ summary: 'Supprimer une formation' })
+  @ApiOperation({ summary: 'Supprimer une certification' })
   @ApiResponse({
     status: 200,
-    description: 'Etat de suppression de la formation',
+    description: 'Etat de suppression de la certification',
   })
   async delete(@Param('id', ParseIntPipe) id: number): Promise<ResponseJson> {
     try {
-      await this.formationService.delete(id);
+      await this.certificationService.delete(id);
 
       return {
         code: 200,
         error: false,
-        message: 'formation supprimé avec succès',
+        message: 'certification supprimée avec succès',
         data: null,
       };
     } catch (err) {

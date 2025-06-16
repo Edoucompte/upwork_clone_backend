@@ -46,14 +46,14 @@ model Compte {
 }
 
 model Fichier {
-  id               Int           @id @default(autoincrement())
+  id               Int            @id @default(autoincrement())
   libelle          String
   path             String
   extension        String
   poids            String
-  certification_id Int
-  certification    Certification @relation(fields: [certification_id], references: [id])
-  compte           Compte?       @relation("CompteProfil")
+  certification_id Int?
+  certification    Certification? @relation(fields: [certification_id], references: [id])
+  compte           Compte?        @relation("CompteProfil")
 }
 
 model Formation {
