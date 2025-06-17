@@ -11,8 +11,6 @@ import { CertificationModule } from './certification/certification.module';
 import { FichierModule } from './fichier/fichier.module';
 import { FormationModule } from './formation/formation.module';
 import { CompetenceModule } from './competence/competence.module';
-import { FormationModule } from './formation/formation.module';
-import { LangueModule } from './langue/langue.module';
 
 @Module({
   imports: [

@@ -1,8 +1,14 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { FileEnumerator } from 'eslint/use-at-your-own-risk';
 import { Certification } from 'generated/prisma';
 import { CompteService } from 'src/compte/compte.service';
 import { CreateCertificationDto } from 'src/dto/certification/create-certification.dto';
 import { UpdateCertificationDto } from 'src/dto/certification/update-certification.dto';
+import { FichierService } from 'src/fichier/fichier.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -10,6 +16,7 @@ export class CertificationService {
   constructor(
     private prisma: PrismaService,
     private readonly compteService: CompteService,
+    private readonly fichierService: FichierService,
   ) {}
 
   // Recherche de toutes les certifications
@@ -28,7 +35,10 @@ export class CertificationService {
   }
 
   // Création de certifications
-  async create(data: CreateCertificationDto): Promise<Certification> {
+  async create(
+    data: CreateCertificationDto,
+    files: Array<Express.Multer.File>,
+  ): Promise<Certification> {
     // Vérification si la certification existe déjà
 
     // verifier si le compte associe existe
@@ -37,9 +47,41 @@ export class CertificationService {
       throw new NotFoundException('Compte fourni inexistant');
     }
 
-    return this.prisma.certification.create({
+    // creer certificstion si compte trouve
+    const certif = await this.prisma.certification.create({
       data: data,
     });
+
+    // enregistrer fichiers associes
+    console.log(files);
+    files.map(async (file) => {
+      try {
+        await this.fichierService.create({
+          libelle: file.filename, // should verify
+          path: file.path, // should ver
+          extension: file.mimetype,
+          poids: `${file.size} octets`, // not sure, verify
+          certification_id: certif.id,
+        });
+      } catch (error) {
+        console.log(error);
+        throw new BadRequestException('Erreur lors de la creation de fichier');
+      }
+    });
+
+    /*return {
+        message: 'Files uploaded successfully!',
+        count: files.length,
+        files: files.map((file) => ({
+          filename: file.filename,
+          originalname: file.originalname,
+          size: file.size,
+          mimetype: file.mimetype,
+          path: file.path,
+        })),
+      }; */
+
+    return certif;
   }
 
   async update(

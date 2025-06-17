@@ -7,6 +7,8 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  UploadedFiles,
+  UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
@@ -14,6 +16,10 @@ import { ResponseJson } from 'src/dto/response-json';
 import { CertificationService } from './certification.service';
 import { CreateCertificationDto } from 'src/dto/certification/create-certification.dto';
 import { UpdateCertificationDto } from 'src/dto/certification/update-certification.dto';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
+import { FileUtils } from 'utils/fileUtils';
 
 @Controller('certification')
 export class CertificationController {
@@ -82,9 +88,24 @@ export class CertificationController {
     status: 200,
     description: 'Etat de creation certification ',
   })
-  async create(@Body() data: CreateCertificationDto): Promise<ResponseJson> {
+  @UseInterceptors(
+    FilesInterceptor('files', 5, {
+      storage: diskStorage({
+        destination: './uploads', // Specify the destination folder
+        filename: FileUtils.filenameCreate, // genere nom de fichier
+      }),
+      fileFilter: FileUtils.fileFilterMaker, // creer un filtre des fichier
+      limits: {
+        fileSize: 1024 * 1024 * 5, // Limit file size to 5MB (optional)
+      },
+    }),
+  )
+  async create(
+    @UploadedFiles() files: Array<Express.Multer.File>,
+    @Body() data: CreateCertificationDto,
+  ): Promise<ResponseJson> {
     try {
-      const certification = await this.certificationService.create(data);
+      const certification = await this.certificationService.create(data, files);
 
       return {
         code: 201,
@@ -101,6 +122,7 @@ export class CertificationController {
       };
     }
   }
+
   //controllers modification d'une certifications
   @Put(':id')
   @ApiOperation({ summary: 'Modifier une certification' })

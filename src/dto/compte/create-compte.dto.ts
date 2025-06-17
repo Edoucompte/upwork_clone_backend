@@ -17,7 +17,7 @@ export class CreateCompteDto {
 
   @IsDateString()
   @IsNotEmpty()
-  taux_horaire: string; // ou Date string ISO ex: '2025-06-11T12:00:00Z'
+  taux_horaire: number; // ou Date string ISO ex: '2025-06-11T12:00:00Z'
 
   @IsOptional()
   @IsInt()

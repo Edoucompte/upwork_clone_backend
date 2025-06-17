@@ -85,7 +85,8 @@ export class CompteService {
       updatedData['titre_compte'] = titre_compte;
     }
 
-    if (taux_horaire && taux_horaire.length > 6) {
+    if (taux_horaire && taux_horaire > 2) {
+      // taux horaire min de 2h par j
       updatedData['taux_horaire'] = taux_horaire;
     }
     if (profil_id && profil_id > 0) {
