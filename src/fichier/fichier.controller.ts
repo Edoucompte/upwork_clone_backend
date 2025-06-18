@@ -11,8 +11,6 @@ import {
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { ResponseJson } from 'src/dto/response-json';
-import { CreateFormationDto } from 'src/dto/formation/create-formation.dto';
-import { UpdateFormationDto } from 'src/dto/formation/update-formation.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { FichierService } from './fichier.service';
 import { CreateFichierDto } from 'src/dto/fichier/create-fichier.dto';

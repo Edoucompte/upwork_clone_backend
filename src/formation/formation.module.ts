@@ -4,7 +4,7 @@ import { FormationService } from './formation.service';
 import { CompteService } from 'src/compte/compte.service';
 
 @Module({
-  controllers: [FormationController, CompteService],
-  providers: [FormationService],
+  controllers: [FormationController],
+  providers: [FormationService, CompteService],
 })
 export class FormationModule {}

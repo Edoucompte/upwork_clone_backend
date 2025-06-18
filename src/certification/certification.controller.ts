@@ -18,7 +18,7 @@ import { CreateCertificationDto } from 'src/dto/certification/create-certificati
 import { UpdateCertificationDto } from 'src/dto/certification/update-certification.dto';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-import { FileUtils } from 'utils/fileUtils';
+import { FileUtils } from 'src/utils/fileUtils';
 
 @Controller('certification')
 export class CertificationController {

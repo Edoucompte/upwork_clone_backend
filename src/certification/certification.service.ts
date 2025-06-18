@@ -3,7 +3,6 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { FileEnumerator } from 'eslint/use-at-your-own-risk';
 import { Certification } from 'generated/prisma';
 import { CompteService } from 'src/compte/compte.service';
 import { CreateCertificationDto } from 'src/dto/certification/create-certification.dto';

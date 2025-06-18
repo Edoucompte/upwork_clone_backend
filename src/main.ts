@@ -21,6 +21,7 @@ async function bootstrap() {
   app.useStaticAssets(join(__dirname, '..', 'uploads'), {
     prefix: '/uploads/', // Optional: URL prefix for accessing files
   });
+
   // Configuration Swagger
   const config = new DocumentBuilder()
     .setTitle('API Upwork Clone') // Titre de la doc
