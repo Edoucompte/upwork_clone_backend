@@ -115,4 +115,18 @@ export class CompteService {
 
     return;
   }
+
+  async uploadPicture({ id, file }: { id: number; file: Express.Multer.File }) {
+    const fichier = await this.prisma.fichier.create({
+      data: {
+        libelle: file.filename, // should verify
+        path: file.path, // should ver
+        extension: file.mimetype,
+        poids: `${file.size} octets`, // not sure, verify
+      },
+    });
+
+    await this.update(id, { profil_id: fichier.id });
+    return;
+  }
 }

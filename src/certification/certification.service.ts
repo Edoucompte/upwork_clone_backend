@@ -53,8 +53,8 @@ export class CertificationService {
 
     // enregistrer fichiers associes
     console.log(files);
-    files.map(async (file) => {
-      try {
+    try {
+      files.map(async (file) => {
         await this.fichierService.create({
           libelle: file.filename, // should verify
           path: file.path, // should ver
@@ -62,11 +62,11 @@ export class CertificationService {
           poids: `${file.size} octets`, // not sure, verify
           certification_id: certif.id,
         });
-      } catch (error) {
-        console.log(error);
-        throw new BadRequestException('Erreur lors de la creation de fichier');
-      }
-    });
+      });
+    } catch (error) {
+      console.log(error);
+      throw new BadRequestException('Erreur lors de la creation de fichier');
+    }
 
     /*return {
         message: 'Files uploaded successfully!',

@@ -11,9 +11,9 @@ import {
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ResponseJson } from 'src/dto/response-json';
-import { CreateLangueDto } from 'src/dto/langue/create-langue.dto';
-import { UpdateLangueDto } from 'src/dto/langue/update-langue.dto';
 import { PortfolioService } from './portfolio.service';
+import { CreatePortfolioDto } from 'src/dto/portfolio/create-portfolio.dto';
+import { UpdatePortfolioDto } from 'src/dto/portfolio/update-portfolio.dto';
 @ApiTags('Portfolio')
 @Controller('portfolio')
 export class PortfolioController {
@@ -82,7 +82,7 @@ export class PortfolioController {
     status: 200,
     description: 'Etat de creation portfolio ',
   })
-  async create(@Body() data: CreateLangueDto): Promise<ResponseJson> {
+  async create(@Body() data: CreatePortfolioDto): Promise<ResponseJson> {
     try {
       const portfolio = await this.portfolioService.create(data);
 
@@ -112,7 +112,7 @@ export class PortfolioController {
     @Param('id', ParseIntPipe) id: number,
 
     @Body(new ValidationPipe())
-    data: UpdateLangueDto,
+    data: UpdatePortfolioDto,
   ): Promise<ResponseJson> {
     try {
       const response = await this.portfolioService.update(id, data);
