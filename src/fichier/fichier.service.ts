@@ -1,16 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Fichier, Formation } from 'generated/prisma';
-import { CertificationService } from 'src/certification/certification.service';
 import { CreateFichierDto } from 'src/dto/fichier/create-fichier.dto';
 import { UpdateFichierDto } from 'src/dto/fichier/update-fichier.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class FichierService {
-  constructor(
-    private prisma: PrismaService,
-    private readonly certificationService: CertificationService,
-  ) {}
+  constructor(private prisma: PrismaService) {}
 
   // Recherche de tous les fichiers
   async findAll(): Promise<Fichier[]> {
@@ -31,7 +27,7 @@ export class FichierService {
   async create(data: CreateFichierDto): Promise<Fichier> {
     // Vérification si la fichiers existe déjà
 
-    return this.prisma.fichier.create({
+    return await this.prisma.fichier.create({
       data: data,
     });
   }
@@ -53,8 +49,9 @@ export class FichierService {
 
     if (certification_id && certification_id > 0) {
       // verifier si certification existe
-      const certifTrouve =
-        await this.certificationService.findBykey(certification_id);
+      const certifTrouve = await this.prisma.certification.findUnique({
+        where: { id },
+      });
       if (!certifTrouve) {
         throw new NotFoundException('certification fournie inexistante');
       }
@@ -73,7 +70,7 @@ export class FichierService {
       updatedData['poids'] = poids;
     }
 
-    return this.prisma.formation.update({
+    return await this.prisma.formation.update({
       where: { id },
       data: updatedData,
     });

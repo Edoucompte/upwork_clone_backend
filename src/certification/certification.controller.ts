@@ -16,9 +16,8 @@ import { ResponseJson } from 'src/dto/response-json';
 import { CertificationService } from './certification.service';
 import { CreateCertificationDto } from 'src/dto/certification/create-certification.dto';
 import { UpdateCertificationDto } from 'src/dto/certification/update-certification.dto';
-import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import { FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-import { extname } from 'path';
 import { FileUtils } from 'utils/fileUtils';
 
 @Controller('certification')
