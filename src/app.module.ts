@@ -11,6 +11,7 @@ import { LangueModule } from './langue/langue.module';
 import { CertificationModule } from './certification/certification.module';
 import { AdresseModule } from './adresse/adresse.module';
 import { CompetenceModule } from './competence/competence.module';
+import { PortfolioModule } from './portfolio/portfolio.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { CompetenceModule } from './competence/competence.module';
     FormationModule,
     LangueModule,
     CertificationModule,
+    PortfolioModule,
   ],
   /*controllers: [AppController],
   providers: [AppService],*/

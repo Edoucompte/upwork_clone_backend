@@ -9,32 +9,32 @@ import {
   Put,
   ValidationPipe,
 } from '@nestjs/common';
-import { LangueService } from './langue.service';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ResponseJson } from 'src/dto/response-json';
 import { CreateLangueDto } from 'src/dto/langue/create-langue.dto';
 import { UpdateLangueDto } from 'src/dto/langue/update-langue.dto';
-@ApiTags('Langues')
-@Controller('langue')
-export class LangueController {
-  constructor(private readonly langueService: LangueService) {}
+import { PortfolioService } from './portfolio.service';
+@ApiTags('Portfolio')
+@Controller('portfolio')
+export class PortfolioController {
+  constructor(private readonly portfolioService: PortfolioService) {}
 
-  //controllers liste des  langues
+  //controllers liste des Portfolios
   @Get()
-  @ApiOperation({ summary: 'Liste des langues' })
+  @ApiOperation({ summary: 'Liste des Portfolios' })
   @ApiResponse({
     status: 200,
-    description: 'Liste des  langues',
+    description: 'Liste des Portfolios',
   })
   async findAll(): Promise<ResponseJson> {
     try {
-      const langues = await this.langueService.findAll();
+      const portfolios = await this.portfolioService.findAll();
 
       return {
         code: 200,
         error: false,
-        message: 'Liste des langues',
-        data: langues,
+        message: 'Liste des portfolios',
+        data: portfolios,
       };
     } catch (err) {
       return {
@@ -46,25 +46,25 @@ export class LangueController {
     }
   }
 
-  //controllers recuperer une langue par son id,
+  //controllers recuperer un portfolio par son id,
   @Get('/:id')
-  @ApiOperation({ summary: 'Trouver une langue' })
+  @ApiOperation({ summary: 'Trouver un portfolio' })
   @ApiResponse({
     status: 200,
-    description: 'Langue trouve',
+    description: 'Portfolio trouve',
   })
   async findBykey(
     @Param('id', ParseIntPipe) id: number,
   ): Promise<ResponseJson> {
     try {
       //const userId = parseInt(id, 10);
-      const langue = await this.langueService.findBykey(id);
+      const portfolio = await this.portfolioService.findBykey(id);
 
       return {
         code: 200,
         error: false,
-        message: 'Langue trouvée',
-        data: langue,
+        message: 'Portfolio trouvé',
+        data: portfolio,
       };
     } catch (err) {
       return {
@@ -75,22 +75,22 @@ export class LangueController {
       };
     }
   }
-  //controllers  creation d'une langue
+  //controllers  creation d'une portfolio
   @Post('create')
-  @ApiOperation({ summary: 'Créer une langue' })
+  @ApiOperation({ summary: 'Créer une portfolio' })
   @ApiResponse({
     status: 200,
-    description: 'Etat de creation langue ',
+    description: 'Etat de creation portfolio ',
   })
   async create(@Body() data: CreateLangueDto): Promise<ResponseJson> {
     try {
-      const compte = await this.langueService.create(data);
+      const portfolio = await this.portfolioService.create(data);
 
       return {
         code: 201,
         error: false,
-        message: 'Langue créé avec succes',
-        data: compte,
+        message: 'portfolio créé avec succes',
+        data: portfolio,
       };
     } catch (err) {
       return {
@@ -101,12 +101,12 @@ export class LangueController {
       };
     }
   }
-  //controllers modification d'une langue
+  //controllers modification d'un portfolio
   @Put(':id')
-  @ApiOperation({ summary: 'Modifier une langue' })
+  @ApiOperation({ summary: 'Modifier un portfolio' })
   @ApiResponse({
     status: 200,
-    description: "Etat de modification d'une langue",
+    description: "Etat de modification d'un portfolio",
   })
   async update(
     @Param('id', ParseIntPipe) id: number,
@@ -115,12 +115,12 @@ export class LangueController {
     data: UpdateLangueDto,
   ): Promise<ResponseJson> {
     try {
-      const response = await this.langueService.update(id, data);
+      const response = await this.portfolioService.update(id, data);
 
       return {
         code: 200,
         error: false,
-        message: 'Langue modifie avec succes',
+        message: 'portfolio modifie avec succes',
         data: response,
       };
     } catch (err) {
@@ -132,21 +132,21 @@ export class LangueController {
       };
     }
   }
-  //controllers  suppression d'un utilisateur
+  //controllers  suppression d'un portfolio
   @Delete(':id')
-  @ApiOperation({ summary: 'Supprimer une langue' })
+  @ApiOperation({ summary: 'Supprimer un portfolio' })
   @ApiResponse({
     status: 200,
-    description: 'Etat de suppression de la langue',
+    description: 'Etat de suppression du portfolio',
   })
   async delete(@Param('id', ParseIntPipe) id: number): Promise<ResponseJson> {
     try {
-      await this.langueService.delete(id);
+      await this.portfolioService.delete(id);
 
       return {
         code: 200,
         error: false,
-        message: 'langue supprimé avec succès',
+        message: 'portfolio supprimé avec succès',
         data: null,
       };
     } catch (err) {
