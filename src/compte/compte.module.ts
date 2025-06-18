@@ -3,7 +3,7 @@ import { CompteController } from './compte.controller';
 import { CompteService } from './compte.service';
 
 @Module({
+  providers: [CompteService],
   controllers: [CompteController],
-  providers: [CompteService]
 })
 export class CompteModule {}

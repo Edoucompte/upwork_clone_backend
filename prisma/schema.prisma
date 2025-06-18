@@ -33,7 +33,7 @@ model Compte {
   id             Int             @id @default(autoincrement())
   role           String
   titre_compte   String
-  taux_horaire   DateTime
+  taux_horaire   Int
   competences    Competence[]
   formations     Formation[]
   langues        Langue[]
@@ -46,14 +46,14 @@ model Compte {
 }
 
 model Fichier {
-  id               Int           @id @default(autoincrement())
+  id               Int            @id @default(autoincrement())
   libelle          String
   path             String
   extension        String
   poids            String
-  certification_id Int
-  certification    Certification @relation(fields: [certification_id], references: [id])
-  compte           Compte?       @relation("CompteProfil")
+  certification_id Int?
+  certification    Certification? @relation(fields: [certification_id], references: [id])
+  compte           Compte?        @relation("CompteProfil")
 }
 
 model Formation {
@@ -72,7 +72,7 @@ model Langue {
   id        Int    @id @default(autoincrement())
   nom       String
   niveau    String
-  compte_id Int   
+  compte_id Int
   compte    Compte @relation(fields: [compte_id], references: [id])
 }
 
@@ -107,7 +107,7 @@ model Portfolio {
 }
 
 model Competence {
-  id           Int       @id @default(autoincrement())
+  id           Int        @id @default(autoincrement())
   competence   String
   compte_id    Int?
   compte       Compte?    @relation(fields: [compte_id], references: [id])

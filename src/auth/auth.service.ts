@@ -9,7 +9,6 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { MailerService } from 'src/user/mailer.service';
 import { createId } from '@paralleldrive/cuid2';
 import { ResetUserPasswordDto } from 'src/dto/user/reset-password.dto';
-import { log } from 'console';
 
 @Injectable()
 export class AuthService {
