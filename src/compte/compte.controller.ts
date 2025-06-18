@@ -7,6 +7,8 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  UploadedFile,
+  UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -15,6 +17,9 @@ import { ResponseJson } from 'src/dto/response-json';
 import { CreateCompteDto } from 'src/dto/compte/create-compte.dto';
 import { UpdateCompteDto } from 'src/dto/compte/update-compte.dto';
 import { Compte } from 'generated/prisma';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { FileUtils } from 'src/utils/fileUtils';
 
 @ApiTags('Comptes')
 //@ApiBearerAuth()
@@ -148,6 +153,52 @@ export class CompteController {
       };
     }
   }
+
+  //controllers  creation d'un profil au compte
+  @Put('profil/:id')
+  @ApiOperation({ summary: 'Ajouter un profil au compte' })
+  @ApiResponse({
+    status: 200,
+    description: 'Etat de creation profil a compte ',
+  })
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: './uploads', // Specify the destination folder
+        filename: FileUtils.filenameCreate, // genere nom de fichier
+      }),
+      fileFilter: FileUtils.fileFilterMaker, // creer un filtre des fichier
+      limits: {
+        fileSize: 1024 * 1024 * 5, // Limit file size to 5MB (optional)
+      },
+    }),
+  )
+  async uploadFile(
+    @UploadedFile() file: Express.Multer.File,
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<ResponseJson> {
+    try {
+      await this.compteService.uploadPicture({
+        id,
+        file,
+      });
+
+      return {
+        code: 200,
+        error: false,
+        message: 'Profil créé avec succes',
+        data: file,
+      };
+    } catch (err) {
+      return {
+        code: err.status | 400,
+        error: true,
+        message: err.message,
+        data: null,
+      };
+    }
+  }
+
   //controllers  suppression d'un utilisateur
   @Delete(':id')
   @ApiOperation({ summary: 'Supprimer un compte' })
