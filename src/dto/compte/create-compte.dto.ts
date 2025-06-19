@@ -19,7 +19,6 @@ export class CreateCompteDto {
   titre_compte: string;
 
   @ApiProperty()
-  @IsDateString()
   @IsNotEmpty()
   taux_horaire: number; // ou Date string ISO ex: '2025-06-11T12:00:00Z'
 

@@ -20,7 +20,9 @@ export class CertificationService {
 
   // Recherche de toutes les certifications
   async findAll(): Promise<Certification[]> {
-    const certifications = await this.prisma.certification.findMany();
+    const certifications = await this.prisma.certification.findMany({
+      include:{fichier: true}, // Inclure les fichiers associés
+    });
     return certifications;
   }
 
@@ -28,6 +30,7 @@ export class CertificationService {
   async findBykey(id: number): Promise<Certification | null> {
     const certification = await this.prisma.certification.findUnique({
       where: { id },
+      include: { fichier: true }, // Inclure les fichiers associés
     });
 
     return certification;
@@ -46,6 +49,7 @@ export class CertificationService {
       throw new NotFoundException('Compte fourni inexistant');
     }
 
+
     // creer certificstion si compte trouve
     const certif = await this.prisma.certification.create({
       data: data,
@@ -61,6 +65,8 @@ export class CertificationService {
           extension: file.mimetype,
           poids: `${file.size} octets`, // not sure, verify
           certification_id: certif.id,
+          compte_id: data.compte_id, // should verify
+          portfolio_id:data[0].portfolio_id, // should verify
         });
       });
     } catch (error) {

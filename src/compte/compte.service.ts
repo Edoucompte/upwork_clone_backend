@@ -16,6 +16,8 @@ export class CompteService {
         formations: true, // récupère toutes les formations associées
         competences: true, // récupère toutes les compétences associées
         portfolios: true, // récupère tous les portfolios associés
+        certifications: true, // récupère toutes les certifications associées
+        profil: true, // récupère le profil associé
       },
     });
     return allcomptes;
@@ -30,6 +32,8 @@ export class CompteService {
         formations: true, // récupère toutes les formations associées
         competences: true, // récupère toutes les compétences associées
         portfolios: true, // récupère tous les portfolios associés
+        certifications: true, // récupère toutes les certifications associées
+        profil: true, // récupère le profil associé
       },
     });
 

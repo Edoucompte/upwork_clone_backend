@@ -39,8 +39,7 @@ model Compte {
   langues        Langue[]
   portfolios     Portfolio[]
   certifications Certification[]
-  profil_id      Int?            @unique
-  profil         Fichier?        @relation("CompteProfil", fields: [profil_id], references: [id])
+  profil         Fichier?     
   user_id        Int             @unique
   user           Users           @relation(fields: [user_id], references: [id])
 }
@@ -53,7 +52,12 @@ model Fichier {
   poids            String
   certification_id Int?
   certification    Certification? @relation(fields: [certification_id], references: [id])
-  compte           Compte?        @relation("CompteProfil")
+
+  compte_id        Int? @unique
+  compte           Compte?        @relation(fields: [compte_id], references: [id])
+
+  portfolio_id        Int? 
+  porfolio           Portfolio?        @relation(fields: [portfolio_id], references: [id])
 }
 
 model Formation {
@@ -101,7 +105,8 @@ model Portfolio {
   titre       String
   role        String
   description String
-  competences Competence[]
+  competences Competence[]        
+  fichiers Fichier[]                                                          
   compte_id   Int
   compte      Compte       @relation(fields: [compte_id], references: [id])
 }

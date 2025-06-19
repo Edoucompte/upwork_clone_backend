@@ -9,12 +9,12 @@ import {
   Put,
   ValidationPipe,
 } from '@nestjs/common';
-import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ResponseJson } from 'src/dto/response-json';
 import { CompetenceService } from './competence.service';
 import { UpdateCompetenceDto } from 'src/dto/competence/update-competence.dto';
 import { CreateCompetenceDto } from 'src/dto/competence/create-competence.dto';
-
+@ApiTags('Competences')
 @Controller('competence')
 export class CompetenceController {
   constructor(private readonly competenceService: CompetenceService) {}
