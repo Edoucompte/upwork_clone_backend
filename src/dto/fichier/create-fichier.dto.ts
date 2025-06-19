@@ -46,4 +46,14 @@ export class CreateFichierDto {
   @IsOptional()
   @IsInt()
   certification_id: number;
+
+  @ApiProperty()
+  @IsOptional()
+  @IsInt()
+  compte_id: number;
+
+  @ApiProperty()
+  @IsOptional()
+  @IsInt()
+  portfolio_id: number;
 }

@@ -19,7 +19,17 @@ export class UserService {
         pays: true,
         createdAt: true,
         adresse: true,
-        compte: true,
+        compte: {
+          include: {
+            competences: true,
+            formations: true,
+            langues: true,
+            portfolios: true,
+            certifications: true,
+            profil: true,
+          },
+        },
+        // pas de password ici → il sera exclu de la réponse
       },
     });
   }
