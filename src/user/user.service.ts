@@ -26,6 +26,7 @@ export class UserService {
             langues: true,
             portfolios: true,
             certifications: true,
+            experiences:true,
             profil: true,
           },
         },

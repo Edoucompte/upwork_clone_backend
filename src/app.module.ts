@@ -12,6 +12,7 @@ import { CertificationModule } from './certification/certification.module';
 import { AdresseModule } from './adresse/adresse.module';
 import { CompetenceModule } from './competence/competence.module';
 import { PortfolioModule } from './portfolio/portfolio.module';
+import { ExperienceModule } from './experience/experience.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { PortfolioModule } from './portfolio/portfolio.module';
     LangueModule,
     CertificationModule,
     PortfolioModule,
+    ExperienceModule,
   ],
   /*controllers: [AppController],
   providers: [AppService],*/
