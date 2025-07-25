@@ -20,6 +20,7 @@ model Users {
   nom                 String
   email               String   @unique
   password            String
+  role                String
   pays                String
   isResettingPassword Boolean  @default(false)
   resetPasswordToken  String?  @unique
@@ -78,6 +79,7 @@ model Langue {
   niveau    String
   compte_id Int
   compte    Compte @relation(fields: [compte_id], references: [id])
+  @@unique([compte_id, nom])  // interdit d'avoir deux langues identiques pour un même compte
 }
 
 model Certification {

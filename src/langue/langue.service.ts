@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { Langue } from 'generated/prisma';
 import { CompteService } from 'src/compte/compte.service';
 import { CreateLangueDto } from 'src/dto/langue/create-langue.dto';
@@ -30,18 +30,29 @@ export class LangueService {
   // Création de langue
 
   async create(data: CreateLangueDto): Promise<Langue> {
-    // Vérification si la langue existe déjà
-
-    // verifier si le compte associe existe
-    const compteTrouve = await this.compteService.findBykey(data.compte_id);
-    if (!compteTrouve) {
-      throw new NotFoundException('Compte fourni inexistant');
-    }
-
-    return this.prisma.langue.create({
-      data: data,
-    });
+  // Vérifier si le compte associé existe
+  const compteTrouve = await this.compteService.findBykey(data.compte_id);
+  if (!compteTrouve) {
+    throw new NotFoundException('Compte fourni inexistant');
   }
+
+  // Vérifier si une langue avec ce compte et ce nom existe déjà
+  const langueExistante = await this.prisma.langue.findFirst({
+    where: {
+      compte_id: data.compte_id,
+      nom: data.nom,  // ou le champ qui identifie la langue (ex: code, langue, etc)
+    },
+  });
+
+  if (langueExistante) {
+    throw new BadRequestException('Ce compte possède déjà cette langue');
+  }
+
+  // Sinon, créer la langue
+  return this.prisma.langue.create({
+    data: data,
+  });
+}
 
   async update(id: number, data: UpdateLangueDto): Promise<Langue> {
     const existing = await this.prisma.langue.findUnique({

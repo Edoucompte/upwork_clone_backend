@@ -32,6 +32,11 @@ export class CreateUserDto {
   //@IsString()
   password: string;
 
+
+  @IsNotEmpty()
+  @IsString()
+  role: string; 
+
   @ApiProperty()
   @IsNotEmpty({
     message: 'Un pays est requis pour cette action',
