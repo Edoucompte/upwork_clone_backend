@@ -18,7 +18,8 @@ export class AuthService {
     private readonly prisma: PrismaService,
     private readonly userService: UserService,
     private readonly mailerService: MailerService,
-    private readonly compteService: CompteService, // Assuming compteService is defined elsewhere
+    private readonly compteService: CompteService,
+ // Assuming compteService is defined elsewhere
   ) {}
 
   async login(data: LoginUserDto) {
@@ -38,7 +39,7 @@ export class AuthService {
     if (!isPasswordValide) {
       throw new UnauthorizedException('Mot de passe incorrect');
     }
-
+     await this.userService.findBykey(user.id);
     //const payload: UserPayload = { sub: user.id, email: user.email };
     const access_token = this.createAccesToken({
       sub: user.id,
@@ -52,6 +53,7 @@ export class AuthService {
         prenom: user.prenom,
         email: user.email,
         pays: user.pays,
+      
       },
     };
   }
@@ -90,8 +92,11 @@ export class AuthService {
     user_id: newUser.id,
   };
 
-    await this.compteService.create(compteDto);
-    return newUser;
+    const createdCompte =  await this.compteService.create(compteDto);
+    return {
+  ...newUser,
+  compte_id: createdCompte.id,
+};
   }
 
   async resetUserPasswordRequest({ email }: { email: string }) {
