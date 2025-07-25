@@ -7,6 +7,7 @@ import { JwtAuthGuard } from './jwt-auth.guard';
 import { UserService } from 'src/user/user.service';
 import { JwtModule } from '@nestjs/jwt';
 import { MailerService } from 'src/user/mailer.service';
+import { CompteModule } from 'src/compte/compte.module';
 
 @Module({
   imports: [
@@ -14,7 +15,7 @@ import { MailerService } from 'src/user/mailer.service';
       global: true,
       secret: process.env.JWT_SECRET, // generate secret hash
       signOptions: { expiresIn: '3600s' },
-    }),
+    }), CompteModule
   ],
   providers: [
     AuthService,

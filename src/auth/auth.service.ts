@@ -9,6 +9,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { MailerService } from 'src/user/mailer.service';
 import { createId } from '@paralleldrive/cuid2';
 import { ResetUserPasswordDto } from 'src/dto/user/reset-password.dto';
+import { CompteService } from 'src/compte/compte.service';
 
 @Injectable()
 export class AuthService {
@@ -17,6 +18,7 @@ export class AuthService {
     private readonly prisma: PrismaService,
     private readonly userService: UserService,
     private readonly mailerService: MailerService,
+    private readonly compteService: CompteService, // Assuming compteService is defined elsewhere
   ) {}
 
   async login(data: LoginUserDto) {
@@ -55,7 +57,8 @@ export class AuthService {
   }
 
   async register(newUserBody: CreateUserDto) {
-    const { email, password, prenom } = newUserBody;
+   console.log(newUserBody);
+    const { email, password, prenom,role } = newUserBody;
 
     const foundUser = await this.userService.findUserByEmail(email);
 
@@ -77,7 +80,18 @@ export class AuthService {
 
     */
     const newUser = await this.userService.create(newUserBody);
-    return newUser.id;
+    console.log(role);
+      // Création automatique du compte selon le rôle
+  const compteDto = {
+    role: role,
+    titre_compte: `Compte ${role}`, // ou personnaliser selon ton besoin
+    taux_horaire: role === 'freelancer' ? 5000 : 0, // Exemple
+     //profil_id: 1, Tu peux lier à un profil par défaut ou dynamique
+    user_id: newUser.id,
+  };
+
+    await this.compteService.create(compteDto);
+    return newUser;
   }
 
   async resetUserPasswordRequest({ email }: { email: string }) {
