@@ -2,9 +2,11 @@ import {
   Body,
   Controller,
   Get,
+  HttpStatus,
   Post,
   Query,
   Req,
+  Res,
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
@@ -22,6 +24,7 @@ import { UserService } from 'src/user/user.service';
 import { ResetUserPasswordDto } from 'src/dto/user/reset-password.dto';
 import { RequestWithUser } from './jwt.strategy';
 import { ResponseJson } from 'src/dto/response-json';
+import { Request, Response } from 'express';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -37,9 +40,12 @@ export class AuthController {
     status: 200,
     description: "Token et inforrmations de l'utilisateur connecte",
   })
-  async login(@Body() data: LoginUserDto): Promise<ResponseJson> {
+  async login(
+    @Body() data: LoginUserDto,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<ResponseJson> {
     try {
-      const response = await this.authService.login(data);
+      const response = await this.authService.login(data, res);
       return {
         code: 200,
         data: response,
@@ -63,9 +69,12 @@ export class AuthController {
     status: 201,
     description: "Id de l'utilisateur nouvellement enregistre",
   })
-  async register(@Body() data: CreateUserDto): Promise<ResponseJson> {
+  async register(
+    @Body() data: CreateUserDto,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<ResponseJson> {
     try {
-      const response = await this.authService.register(data);
+      const response = await this.authService.register(data, res);
       return {
         code: 200,
         data: response,
@@ -76,6 +85,35 @@ export class AuthController {
       console.log(error.message);
       return {
         code: 400,
+        data: null,
+        error: true,
+        message: error.message,
+      };
+    }
+  }
+
+  @Post('refresh')
+  @ApiOperation({ summary: 'rafraichir tokens expire' })
+  @ApiResponse({
+    status: 200,
+    description: "cookies contenant les tokens de l'utilisateur",
+  })
+  async refreshTokens(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<ResponseJson> {
+    try {
+      const response = await this.authService.refreshTokens(req, res);
+      return {
+        code: 200,
+        data: response,
+        error: false,
+        message: "cookies contenant les tokens de l'utilisateur",
+      };
+    } catch (error) {
+      console.log(error.message);
+      return {
+        code: 401,
         data: null,
         error: true,
         message: error.message,
@@ -105,7 +143,7 @@ export class AuthController {
     } catch (error) {
       console.log(error.message);
       return {
-        code: 400,
+        code: 401,
         data: null,
         error: true,
         message: error.message,
@@ -137,7 +175,7 @@ export class AuthController {
     } catch (error) {
       console.log(error.message);
       return {
-        code: 400,
+        code: 401,
         data: null,
         error: true,
         message: error.message,
@@ -200,7 +238,35 @@ export class AuthController {
     } catch (error) {
       console.log(error.message);
       return {
-        code: 400,
+        code: 401,
+        data: null,
+        error: true,
+        message: error.message,
+      };
+    }
+  }
+
+  @Post()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Deconnexion d'utilisateur " })
+  @ApiResponse({
+    status: 200,
+    description: 'utilisateur deconnecte',
+  })
+  logout(@Res({ passthrough: true }) res: Response): ResponseJson {
+    try {
+      const response = this.authService.clearTokensFromCookies(res);
+      return {
+        code: HttpStatus.OK,
+        data: response,
+        message: 'Utilisateur authentifié',
+        error: false,
+      };
+    } catch (error) {
+      console.log(error.message);
+      return {
+        code: 401,
         data: null,
         error: true,
         message: error.message,

@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Users } from 'generated/prisma';
 import { OutputUser } from 'src/dto/user/output-user.dto';
@@ -26,7 +30,7 @@ export class UserService {
             langues: true,
             portfolios: true,
             certifications: true,
-            experiences:true,
+            experiences: true,
             profil: true,
           },
         },
@@ -97,7 +101,7 @@ export class UserService {
       throw new NotFoundException(`Utilisateur avec l'id ${id} non trouvé`);
     }
     const { prenom, nom, email, pays } = data;
-    console.log(data);
+    //console.log(data);
 
     // verifiez si parametre non vide et valide
     const updatedData = {};
@@ -123,6 +127,33 @@ export class UserService {
     });
   }
 
+  async updateTokens(
+    id: number,
+    accessToken: string,
+    refreshToken: string,
+  ): Promise<Users> {
+    const existing = await this.prisma.users.findUnique({
+      where: { id },
+    });
+
+    if (!existing) {
+      throw new NotFoundException(`Utilisateur avec l'id ${id} non trouvé`);
+    }
+
+    // verifiez si parametre non vide et valide
+    if (accessToken.length > 10 && refreshToken.length > 10) {
+      return this.prisma.users.update({
+        where: { id },
+        data: {
+          access_token: accessToken,
+          refresh_token: refreshToken,
+        },
+      });
+    } else {
+      throw new UnauthorizedException('Token invalide');
+    }
+  }
+
   // Suppression d'un utilisateur
 
   async delete(id: number): Promise<any> {
@@ -139,5 +170,16 @@ export class UserService {
     });
 
     return;
+  }
+
+  async verifyRefreshToken(id: number, refreshToken: string) {
+    const foundUser = await this.prisma.users.findUnique({
+      where: { id },
+    });
+
+    if (!foundUser || foundUser.refresh_token !== refreshToken) {
+      return false;
+    }
+    return true;
   }
 }

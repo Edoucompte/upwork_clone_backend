@@ -20,6 +20,8 @@ model Users {
   nom                 String
   email               String   @unique
   password            String
+  access_token        String?  @unique
+  refresh_token       String?  @unique
   role                String
   pays                String
   isResettingPassword Boolean  @default(false)
@@ -39,9 +41,9 @@ model Compte {
   formations     Formation[]
   langues        Langue[]
   portfolios     Portfolio[]
-  experiences    Experience[] 
+  experiences    Experience[]
   certifications Certification[]
-  profil         Fichier?     
+  profil         Fichier?
   user_id        Int             @unique
   user           Users           @relation(fields: [user_id], references: [id])
 }
@@ -55,11 +57,11 @@ model Fichier {
   certification_id Int?
   certification    Certification? @relation(fields: [certification_id], references: [id])
 
-  compte_id        Int? @unique
-  compte           Compte?        @relation(fields: [compte_id], references: [id])
+  compte_id Int?    @unique
+  compte    Compte? @relation(fields: [compte_id], references: [id])
 
-  portfolio_id        Int? 
-  porfolio           Portfolio?        @relation(fields: [portfolio_id], references: [id])
+  portfolio_id Int?
+  porfolio     Portfolio? @relation(fields: [portfolio_id], references: [id])
 }
 
 model Formation {
@@ -80,7 +82,8 @@ model Langue {
   niveau    String
   compte_id Int
   compte    Compte @relation(fields: [compte_id], references: [id])
-  @@unique([compte_id, nom])  // interdit d'avoir deux langues identiques pour un même compte
+
+  @@unique([compte_id, nom]) // interdit d'avoir deux langues identiques pour un même compte
 }
 
 model Certification {
@@ -108,8 +111,8 @@ model Portfolio {
   titre       String
   role        String
   description String
-  competences Competence[]        
-  fichiers Fichier[]                                                          
+  competences Competence[]
+  fichiers    Fichier[]
   compte_id   Int
   compte      Compte       @relation(fields: [compte_id], references: [id])
 }
@@ -124,19 +127,18 @@ model Competence {
 }
 
 model Experience {
-  id                     Int      @id @default(autoincrement())
-  titre                  String
-  entreprise             String
-  emplacement            String
-  pays                   String
-  travailleActuellement  Boolean  @default(false)
-  dateDebut              String   // Format: 'YYYY-MM'
-  dateFin                String?  // 'YYYY-MM' ou null si en cours
-  description            String
-  createdAt              DateTime @default(now())
-  updatedAt              DateTime @updatedAt
+  id                    Int      @id @default(autoincrement())
+  titre                 String
+  entreprise            String
+  emplacement           String
+  pays                  String
+  travailleActuellement Boolean  @default(false)
+  dateDebut             String // Format: 'YYYY-MM'
+  dateFin               String? // 'YYYY-MM' ou null si en cours
+  description           String
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
 
-  compte_id              Int
-  compte                 Compte   @relation(fields: [compte_id], references: [id])
+  compte_id Int
+  compte    Compte @relation(fields: [compte_id], references: [id])
 }
-
