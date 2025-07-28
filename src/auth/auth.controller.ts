@@ -11,7 +11,7 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import {
-  ApiBearerAuth,
+  //ApiBearerAuth,
   ApiOperation,
   ApiResponse,
   ApiTags,
@@ -92,7 +92,7 @@ export class AuthController {
     }
   }
 
-  @Post('refresh')
+  @Post('token/refresh')
   @ApiOperation({ summary: 'rafraichir tokens expire' })
   @ApiResponse({
     status: 200,
@@ -217,8 +217,8 @@ export class AuthController {
   // la strategy ici se charge de recuperer le token, et de chercher le user qui
   // lui correspond automatiquement
   @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @Get()
+  //@ApiBearerAuth()
+  @Get('authenticate')
   @ApiOperation({ summary: "Authentification d'utilisateur par token" })
   @ApiResponse({
     status: 200,
@@ -248,7 +248,7 @@ export class AuthController {
 
   @Post()
   @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
+  //@ApiBearerAuth()
   @ApiOperation({ summary: "Deconnexion d'utilisateur " })
   @ApiResponse({
     status: 200,
