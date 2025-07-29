@@ -87,7 +87,7 @@ export class AuthController {
       return {
         code: 400,
         data: null,
-        error: false,
+        error: true,
         message: error.message,
       };
     }
@@ -116,7 +116,7 @@ export class AuthController {
       return {
         code: 400,
         data: null,
-        error: false,
+        error: true,
         message: error.message,
       };
     }
