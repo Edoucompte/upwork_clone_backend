@@ -15,7 +15,8 @@ import { CompteModule } from 'src/compte/compte.module';
       global: true,
       secret: process.env.JWT_SECRET, // generate secret hash
       signOptions: { expiresIn: '3600s' },
-    }), CompteModule
+    }),
+    CompteModule,
   ],
   providers: [
     AuthService,

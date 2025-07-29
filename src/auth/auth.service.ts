@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { LoginUserDto } from 'src/dto/user/login-user.dto';
 import * as bcrypt from 'bcrypt';
@@ -10,6 +14,7 @@ import { MailerService } from 'src/user/mailer.service';
 import { createId } from '@paralleldrive/cuid2';
 import { ResetUserPasswordDto } from 'src/dto/user/reset-password.dto';
 import { CompteService } from 'src/compte/compte.service';
+import { Request, Response } from 'express';
 
 @Injectable()
 export class AuthService {
@@ -19,12 +24,13 @@ export class AuthService {
     private readonly userService: UserService,
     private readonly mailerService: MailerService,
     private readonly compteService: CompteService,
- // Assuming compteService is defined elsewhere
+    // Assuming compteService is defined elsewhere
   ) {}
 
-  async login(data: LoginUserDto) {
+  async login(data: LoginUserDto, res: Response) {
     const { password, email } = data;
 
+    // verify user credentials
     const user = await this.userService.findUserByEmail(email);
 
     if (!user) {
@@ -39,28 +45,32 @@ export class AuthService {
     if (!isPasswordValide) {
       throw new UnauthorizedException('Mot de passe incorrect');
     }
-     await this.userService.findBykey(user.id);
+    //await this.userService.findBykey(user.id);
     //const payload: UserPayload = { sub: user.id, email: user.email };
-    const access_token = this.createAccesToken({
+
+    // geneerate tokens
+    const { accessToken, refreshToken } = this.createTokens({
       sub: user.id,
       email: user.email,
     });
 
+    // store tokens
+    await this.userService.updateTokens(user.id, accessToken, refreshToken);
+
+    // set tokens in the cookies
+    this.setTokensInCookies(res, accessToken, refreshToken);
+
     return {
-      access_token,
-      user: {
-        id: user.id,
-        prenom: user.prenom,
-        email: user.email,
-        pays: user.pays,
-      
-      },
+      id: user.id,
+      prenom: user.prenom,
+      email: user.email,
+      pays: user.pays,
     };
   }
 
-  async register(newUserBody: CreateUserDto) {
-   console.log(newUserBody);
-    const { email, password, prenom,role } = newUserBody;
+  async register(newUserBody: CreateUserDto, res: Response) {
+    //console.log(newUserBody);
+    const { email, password, prenom, role } = newUserBody;
 
     const foundUser = await this.userService.findUserByEmail(email);
 
@@ -70,10 +80,10 @@ export class AuthService {
 
     newUserBody.password = await this.hashPassword({ password });
 
-    await this.mailerService.createAccountEmail({
+    /*await this.mailerService.createAccountEmail({
       prenom,
       recipient: email,
-    });
+    });*/
 
     /* 
       Possibilite de l'authentifier direct 
@@ -82,21 +92,56 @@ export class AuthService {
 
     */
     const newUser = await this.userService.create(newUserBody);
-    console.log(role);
-      // Création automatique du compte selon le rôle
-  const compteDto = {
-    role: role,
-    titre_compte: `Compte ${role}`, // ou personnaliser selon ton besoin
-    taux_horaire: role === 'freelancer' ? 5000 : 0, // Exemple
-     //profil_id: 1, Tu peux lier à un profil par défaut ou dynamique
-    user_id: newUser.id,
-  };
+    //console.log(role);
+    // Création automatique du compte selon le rôle
+    const compteDto = {
+      role: role,
+      titre_compte: `Compte ${role}`, // ou personnaliser selon ton besoin
+      taux_horaire: role === 'freelancer' ? 5000 : 0, // Exemple
+      //profil_id: 1, Tu peux lier à un profil par défaut ou dynamique
+      user_id: newUser.id,
+    };
 
-    const createdCompte =  await this.compteService.create(compteDto);
+    const createdCompte = await this.compteService.create(compteDto);
+
+    // generer les tokens
+    const { accessToken, refreshToken } = this.createTokens({
+      sub: newUser.id,
+      email: newUser.email,
+    });
+
+    // stocker tokens
+    await this.userService.updateTokens(newUser.id, accessToken, refreshToken);
+
+    // set tokens in the cookies
+    this.setTokensInCookies(res, accessToken, refreshToken);
+
     return {
-  ...newUser,
-  compte_id: createdCompte.id,
-};
+      //...newUser,
+      id: newUser.id,
+      email: newUser.email,
+      prenom: newUser.prenom,
+      nom: newUser.nom,
+      role: newUser.role,
+      pays: newUser.pays,
+      createdAt: newUser.createdAt,
+      compte_id: createdCompte.id,
+    };
+  }
+
+  async refreshTokens(req: Request, res: Response) {
+    const oldRefreshToken = req.cookies['refresh_token'];
+
+    if (!oldRefreshToken) {
+      throw new UnauthorizedException('Pas de token trouve');
+    }
+
+    // ils verifier, cree et met a jour
+    const { accessToken, refreshToken } =
+      await this.createRefreshToken(oldRefreshToken);
+
+    // set nouveau tokens dans les cookies
+    this.setTokensInCookies(res, accessToken, refreshToken);
   }
 
   async resetUserPasswordRequest({ email }: { email: string }) {
@@ -179,9 +224,12 @@ export class AuthService {
     return 'Veuillez consulter vos emails pour reinnitialiser votre mot de passe ';
   }
 
-  private createAccesToken(payload: UserPayload) {
+  private createTokens(payload: UserPayload) {
     return {
-      acces_token: this.jwtService.sign(payload),
+      accessToken: this.jwtService.sign(payload),
+      refreshToken: this.jwtService.sign(payload, {
+        expiresIn: '2d',
+      }),
     };
   }
 
@@ -197,5 +245,75 @@ export class AuthService {
     hashedPassword: string;
   }) {
     return await bcrypt.compare(password, hashedPassword);
+  }
+
+  // Method to set tokens in HTTP-only cookies
+  setTokensInCookies(res: Response, accessToken: string, refreshToken: string) {
+    const accessTokenExpires = new Date(
+      Date.now() + 1 * 60 * 60 * 1000,
+      //this.configService.get<number>('JWT_ACCESS_TOKEN_EXPIRATION_TIME_MS'), // Convert to milliseconds
+    );
+    const refreshTokenExpires = new Date(
+      Date.now() + 2 * 24 * 60 * 60 * 1000,
+      //this.configService.get<number>('JWT_REFRESH_TOKEN_EXPIRATION_TIME_MS'), // Convert to milliseconds
+    );
+
+    // Set Access Token Cookie
+    res.cookie('access_token', accessToken, {
+      httpOnly: true, // Cannot be accessed by client-side JavaScript
+      secure: false, //this.configService.get<string>('NODE_ENV') === 'production', // Send only over HTTPS in production
+      expires: accessTokenExpires, // Set expiration date
+      sameSite: 'lax', // Protects against some CSRF attacks (flexible for development)
+      path: '/', // Accessible across the entire domain
+    });
+
+    // Set Refresh Token Cookie
+    res.cookie('refresh_token', refreshToken, {
+      httpOnly: true,
+      secure: false, //this.configService.get<string>('NODE_ENV') === 'production',
+      expires: refreshTokenExpires,
+      sameSite: 'lax',
+      path: '/auth/ref', // Or a more specific path if your refresh endpoint is isolated
+      // You might set a different path for the refresh token to limit its scope
+    });
+  }
+
+  // (Optional) Method to clear cookies on logout
+  clearTokensFromCookies(res: Response) {
+    res.clearCookie('access_token', {
+      httpOnly: true,
+      secure: false, //this.configService.get<string>('NODE_ENV') === 'production',
+      sameSite: 'lax',
+      path: '/',
+    });
+    res.clearCookie('refresh_token', {
+      httpOnly: true,
+      secure: false, //this.configService.get<string>('NODE_ENV') === 'production',
+      sameSite: 'lax',
+      path: '/auth/ref',
+    });
+  }
+
+  // Method to validate refresh token and generate new tokens
+  async createRefreshToken(refreshToken: string) {
+    try {
+      const payload = this.jwtService.verify<UserPayload>(refreshToken, {
+        secret: process.env.JWT_SECRET,
+      });
+
+      // verifier si token correspond avec token de user avec cet id
+      const isValid = await this.userService.verifyRefreshToken(
+        payload.sub,
+        refreshToken,
+      );
+      if (!isValid) {
+        throw new UnauthorizedException('Refresh token invalide');
+      }
+
+      //const { sub: userId, email } = payload;
+      return this.createTokens(payload); // Generate new access and refresh tokens
+    } catch (error) {
+      throw new UnauthorizedException('Invalid or expired refresh token');
+    }
   }
 }
