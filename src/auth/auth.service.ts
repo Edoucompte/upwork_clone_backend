@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { LoginUserDto } from 'src/dto/user/login-user.dto';
 import * as bcrypt from 'bcrypt';
@@ -76,10 +80,10 @@ export class AuthService {
 
     newUserBody.password = await this.hashPassword({ password });
 
-    await this.mailerService.createAccountEmail({
+    /*await this.mailerService.createAccountEmail({
       prenom,
       recipient: email,
-    });
+    });*/
 
     /* 
       Possibilite de l'authentifier direct 

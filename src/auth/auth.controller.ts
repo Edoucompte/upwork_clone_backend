@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
@@ -76,17 +77,17 @@ export class AuthController {
     try {
       const response = await this.authService.register(data, res);
       return {
-        code: 200,
+        code: 201,
         data: response,
         error: false,
         message: "Identifiant de l'utilisateur inscrit",
       };
     } catch (error) {
-      console.log(error.message);
+      //console.log(error.message);
       return {
         code: 400,
         data: null,
-        error: true,
+        error: false,
         message: error.message,
       };
     }
@@ -113,9 +114,9 @@ export class AuthController {
     } catch (error) {
       console.log(error.message);
       return {
-        code: 401,
+        code: 400,
         data: null,
-        error: true,
+        error: false,
         message: error.message,
       };
     }

@@ -13,7 +13,11 @@ async function bootstrap() {
   app.enableCors({
     origin: 'http://localhost:5173', // Frontend autorisé
     credentials: true, // Si tu utilises les cookies ou les headers Authorization
+    methods: 'GET,PUT,HEAD,PATCH,POST,DELETE,OPTIONS',
+    allowedHeaders: 'Content-Type, Accept, AUthorization',
   });
+
+  app.use(cookieParser());
 
   // pour les validations
   app.useGlobalPipes(
@@ -27,8 +31,6 @@ async function bootstrap() {
   app.useStaticAssets(join(__dirname, '..', 'uploads'), {
     prefix: '/uploads/', // Optional: URL prefix for accessing files
   });
-
-  app.use(cookieParser());
 
   // Configuration Swagger
   const config = new DocumentBuilder()
