@@ -69,7 +69,7 @@ export class AuthService {
   }
 
   async register(newUserBody: CreateUserDto, res: Response) {
-    //console.log(newUserBody);
+    console.log(newUserBody);
     const { email, password, prenom, role } = newUserBody;
 
     const foundUser = await this.userService.findUserByEmail(email);
@@ -109,12 +109,14 @@ export class AuthService {
       sub: newUser.id,
       email: newUser.email,
     });
+    console.log(accessToken, refreshToken);
 
     // stocker tokens
     await this.userService.updateTokens(newUser.id, accessToken, refreshToken);
 
     // set tokens in the cookies
     this.setTokensInCookies(res, accessToken, refreshToken);
+    console.log(res);
 
     return {
       //...newUser,

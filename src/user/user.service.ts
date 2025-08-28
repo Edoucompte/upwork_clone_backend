@@ -54,9 +54,9 @@ export class UserService {
       },
     });
 
-    /*if (!user) {
+    if (!user) {
       throw new NotFoundException(`Utilisateur avec l'id ${id} non trouvé`);
-    }*/
+    }
 
     return user;
   }

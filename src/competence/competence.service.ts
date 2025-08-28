@@ -4,8 +4,10 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Competence } from 'generated/prisma';
+import { RequestWithUser } from 'src/auth/jwt.strategy';
 import { CompteService } from 'src/compte/compte.service';
 import { CreateCompetenceDto } from 'src/dto/competence/create-competence.dto';
+import { CreateCompetencesDto } from 'src/dto/competence/create-competences.dto';
 import { UpdateCompetenceDto } from 'src/dto/competence/update-competence.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 
@@ -42,6 +44,46 @@ export class CompetenceService {
     return this.prisma.competence.create({
       data: data,
     });
+  }
+
+  async createAll(
+    data: CreateCompetencesDto,
+    request: RequestWithUser,
+  ): Promise<string[]> {
+    const user = await this.prisma.users.findUnique({
+      where: { id: request.user.sub, email: request.user.email },
+      select: {
+        compte: true,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException(`User non trouvé`);
+    }
+
+    const { skills } = data;
+    const userCompteId: number | undefined = user.compte.findLast(
+      (compte) => compte.role === 'freelancer',
+    )?.id;
+    //console.log(userCompteId);
+
+    if (!userCompteId) {
+      throw new BadRequestException('Requete erronee');
+    }
+
+    const compteData = skills.map((skill) => {
+      return {
+        competence: skill,
+        compte_id: userCompteId,
+      };
+    });
+
+    await this.prisma.competence.createMany({
+      data: compteData,
+      skipDuplicates: true,
+    });
+
+    return skills;
   }
 
   async update(id: number, data: UpdateCompetenceDto): Promise<Competence> {
